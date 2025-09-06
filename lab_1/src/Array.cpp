@@ -116,7 +116,7 @@ int MyArray::equalize(const int* arr, int other_size) {
     return 0;
 }
 
-const void MyArray::print() {
+void MyArray::print() const {
     if (data == nullptr || size == 0) {
         std::cout << "Массив пуст! " << std::endl;
         return;
@@ -152,7 +152,7 @@ void MyArray::clear() {
     size = 0;
 }
 
-const int MyArray::get_size() {
+int MyArray::get_size() const {
     return size;
 }
 

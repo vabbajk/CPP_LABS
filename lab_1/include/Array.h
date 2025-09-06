@@ -26,9 +26,8 @@ class MyArray {
         void clear();
 
 
-
-        const int get_size();
-        const void  print();
+        int get_size() const;
+        void  print() const ;
 
 
 };
