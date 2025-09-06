@@ -7,12 +7,17 @@
 using namespace std;
 
 int MyArray::allocate_memory() {
-    data = new int[size];
+    if (size <= 0) {
+        data = nullptr;
+        return -1;
+    }
 
+    data = new (std::nothrow) int[size];
     if (data == nullptr) {
-        std::cerr << "Memory allocation failed" << std::endl;
+        std::cerr << "Ошибка выделения памяти!" << std::endl;
         exit(1);
     }
+
     return 0;
 }
 
@@ -47,7 +52,7 @@ MyArray::~MyArray() {
 }
 
 MyArray operator+(const MyArray& left, const MyArray& right) {
-    MyArray result(left.size + left.size);
+    MyArray result(left.size + right.size);
 
     for (int i = 0; i < left.size; i++) {
         result.data[i] = left.data[i];
@@ -72,7 +77,6 @@ MyArray operator&(const MyArray& a, const MyArray& b) {
     }
     return result;
 }
-
 
 MyArray& MyArray::operator=(const MyArray& other) {
     if (this == &other) {
