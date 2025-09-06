@@ -54,6 +54,10 @@ MyArray::~MyArray() {
 MyArray operator+(const MyArray& left, const MyArray& right) {
     MyArray result(left.size + right.size);
 
+    if (result.data == nullptr || left.data == nullptr || right.data == nullptr) {
+        exit(1);
+    }
+
     for (int i = 0; i < left.size; i++) {
         result.data[i] = left.data[i];
     }
