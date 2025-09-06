@@ -51,37 +51,6 @@ MyArray::~MyArray() {
     }
 }
 
-MyArray operator+(const MyArray& left, const MyArray& right) {
-    MyArray result(left.size + right.size);
-
-    if (result.data == nullptr || left.data == nullptr || right.data == nullptr) {
-        exit(1);
-    }
-
-    for (int i = 0; i < left.size; i++) {
-        result.data[i] = left.data[i];
-    }
-
-    for (int i = 0; i < right.size; i++) {
-        result.data[left.size + i] = right.data[i];
-    }
-
-    return result;
-}
-
-MyArray operator&(const MyArray& a, const MyArray& b) {
-    MyArray result;
-    for (int i = 0; i < a.size; i++) {
-        for (int j = 0; j < b.size; j++) {
-            if (a.data[i] == b.data[j]) {
-                result.append(a.data[i]);
-                break;
-            }
-        }
-    }
-    return result;
-}
-
 MyArray& MyArray::operator=(const MyArray& other) {
     if (this == &other) {
         return *this;

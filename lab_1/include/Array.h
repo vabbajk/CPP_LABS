@@ -18,9 +18,40 @@ class MyArray {
         explicit MyArray(int size);
         MyArray(const MyArray& other);
         ~MyArray();
-        friend MyArray operator+(const MyArray& a, const MyArray& b);
-        friend MyArray operator&(const MyArray& a, const MyArray& b);
+
+        friend MyArray operator+(const MyArray& left, const MyArray& right) {
+            MyArray result(left.size + right.size);
+
+            if (result.data == nullptr || left.data == nullptr || right.data == nullptr) {
+                exit(1);
+            }
+
+            for (int i = 0; i < left.size; i++) {
+                result.data[i] = left.data[i];
+            }
+
+            for (int i = 0; i < right.size; i++) {
+                result.data[left.size + i] = right.data[i];
+            }
+
+            return result;
+        }
+
+        friend MyArray operator&(const MyArray& left, const MyArray& right) {
+            MyArray result;
+            for (int i = 0; i < left.size; i++) {
+                for (int j = 0; j < right.size; j++) {
+                    if (left.data[i] == right.data[j]) {
+                        result.append(left.data[i]);
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+
         MyArray& operator=(const MyArray &other);
+
         int equalize(const int* arr, int other_size);
         int append(int value);
         void clear();
