@@ -9,7 +9,7 @@ using namespace std;
 int MyArray::allocate_memory() {
     data = new int[size];
 
-    if (data == NULL) {
+    if (data == nullptr) {
         std::cerr << "Memory allocation failed" << std::endl;
         exit(1);
     }
@@ -31,25 +31,48 @@ MyArray::MyArray(int size)  : size(size) {
     allocate_memory();
 }
 
+MyArray::MyArray(const MyArray& other)
+    : size(other.size),
+      data(new int[size]) {
+
+    for (int i = 0; i < size; i++) {
+        data[i] = other.data[i];
+    }
+}
+
 MyArray::~MyArray() {
     if (data != nullptr) {
         free_memory();
     }
 }
 
-MyArray MyArray::operator+(const MyArray& other) {
-    MyArray result(size + other.size);
+MyArray operator+(const MyArray& left, const MyArray& right) {
+    MyArray result(left.size + left.size);
 
-    for (int i = 0; i < size; i++) {
-        result.data[i] = data[i];
+    for (int i = 0; i < left.size; i++) {
+        result.data[i] = left.data[i];
     }
 
-    for (int i = 0; i < other.size; i++) {
-        result.data[size + i] = other.data[i];
+    for (int i = 0; i < right.size; i++) {
+        result.data[left.size + i] = right.data[i];
     }
 
     return result;
 }
+
+MyArray operator&(const MyArray& a, const MyArray& b) {
+    MyArray result;
+    for (int i = 0; i < a.size; i++) {
+        for (int j = 0; j < b.size; j++) {
+            if (a.data[i] == b.data[j]) {
+                result.append(a.data[i]);
+                break;
+            }
+        }
+    }
+    return result;
+}
+
 
 MyArray& MyArray::operator=(const MyArray& other) {
     if (this == &other) {
@@ -67,7 +90,7 @@ MyArray& MyArray::operator=(const MyArray& other) {
     return *this;
 }
 
-int MyArray::equalize(int* arr, int other_size) {
+int MyArray::equalize(const int* arr, int other_size) {
     if (data != nullptr) {
         free_memory();
     }
@@ -85,7 +108,7 @@ int MyArray::equalize(int* arr, int other_size) {
     return 0;
 }
 
-void MyArray::print() {
+const void MyArray::print() {
     if (data == nullptr || size == 0) {
         std::cout << "Массив пуст! " << std::endl;
         return;
@@ -98,7 +121,8 @@ void MyArray::print() {
 }
 
 int MyArray::append(int value) {
-    int* temp = new int[size + 1];
+
+    auto temp = new int[size + 1];
 
     for (int i = 0; i < size; i++) {
         temp[i] = data[i];
@@ -120,22 +144,7 @@ void MyArray::clear() {
     size = 0;
 }
 
-MyArray MyArray::operator&(const MyArray &other) const {
-    MyArray result;
-
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < other.size; j++) {
-            if (data[i] == other.data[j]) {
-                result.append(data[i]);
-                break; // Избегаем дублирования
-            }
-        }
-    }
-
-    return result;
-}
-
-int MyArray::get_size() {
+const int MyArray::get_size() {
     return size;
 }
 

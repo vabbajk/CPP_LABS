@@ -5,8 +5,9 @@ class MyArray {
 
     private:
 
-        int *data;
         int size;
+        int *data{};
+
 
         int allocate_memory();
         int free_memory();
@@ -14,18 +15,20 @@ class MyArray {
     public:
 
         MyArray();
-        MyArray(int size);
+        explicit MyArray(int size);
+        MyArray(const MyArray& other);
         ~MyArray();
-        MyArray operator+(const MyArray &other);
+        friend MyArray operator+(const MyArray& a, const MyArray& b);
+        friend MyArray operator&(const MyArray& a, const MyArray& b);
         MyArray& operator=(const MyArray &other);
-        int equalize(int* arr, int other_size);
+        int equalize(const int* arr, int other_size);
         int append(int value);
         void clear();
 
-        MyArray operator&(const MyArray &other) const;
 
-        int get_size();
-        void print();
+
+        const int get_size();
+        const void  print();
 
 
 };

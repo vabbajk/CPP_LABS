@@ -61,6 +61,10 @@ int main(){
             case '0':
                 running = 0;
                 break;
+            default:
+                cout << "Как ты попал сюда?" << endl;
+                running = 0;
+                system("pause");
         }
         system("cls");
     }

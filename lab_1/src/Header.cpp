@@ -7,11 +7,6 @@
 
 using namespace std;
 
-#include <iostream>
-#include <string>
-#include <climits>
-#include <conio.h>
-
 bool check_int_1(const std::string &input, int min, int max, long long &out) {
     if (input.empty()) return false;
 
@@ -50,42 +45,50 @@ int new_input_metod(int min, int max) {
     while (true) {
         char key = _getch();
 
-        if (key == 27) {
-            return INT_MIN;
-        }
+        switch (key) {
+            case 27:
+                return INT_MIN;
 
-        if (key == ' ') {
-            if (!line.empty() && line.back() != ' ' && line.back() != '-') {
-                line.push_back(' ');
-                std::cout << ' ';
-            }
-        }
-        else if (key == '-') {
-            if (line.empty() || line.back() == ' ') {
-                line.push_back('-');
-                std::cout << '-';
-            }
-        }
-        else if (key >= '0' && key <= '9') {
-            line.push_back(key);
-            std::cout << key;
-        }
-        else if (key == '\b') {
-            if (!line.empty()) {
-                std::cout << "\b \b";
-                line.pop_back();
-            }
-        }
-        else if (key == '\r' || key == '\n') {
-            if (!line.empty() && line.back() != '-' && check_int_1(line, min, max, value)) {
-                break;
-            }
+            case ' ':
+                if (!line.empty() && line.back() != ' ' && line.back() != '-') {
+                    line.push_back(' ');
+                    std::cout << ' ';
+                }
+            break;
+
+            case '-':
+                if (line.empty() || line.back() == ' ') {
+                    line.push_back('-');
+                    std::cout << '-';
+                }
+            break;
+
+            case '\b':
+                if (!line.empty()) {
+                    std::cout << "\b \b";
+                    line.pop_back();
+                }
+            break;
+
+            case '\r':
+            case '\n':
+                if (!line.empty() && line.back() != '-' &&
+                    check_int_1(line, min, max, value)) {
+                    std::cout << std::endl;
+                    return static_cast<int>(value);
+                    }
+            break;
+
+            default:
+                if (key >= '0' && key <= '9') {
+                    line.push_back(key);
+                    std::cout << key;
+                }
+            break;
         }
     }
-
-    std::cout << std::endl;
-    return static_cast<int>(value);
 }
+
 
 
 char choce_task_n_to_m(char n, char m)  {
