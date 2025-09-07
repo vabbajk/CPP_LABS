@@ -101,6 +101,10 @@ int MyArray::append(int value) {
 
     auto temp = new int[size + 1];
 
+    if (temp==nullptr) {
+        exit(1);
+    }
+
     for (int i = 0; i < size; i++) {
         temp[i] = data[i];
     }
@@ -128,12 +132,12 @@ int MyArray::get_size() const {
 void input_array(MyArray & array) {
     cout << "¬ведите количество добавл€емых элементов: ";
 
-    int array_size = new_input_metod(1, INT_MAX);
+    int array_size = new_input_metod(0, INT_MAX);
     int temp;
 
     for (int i = 0; i < array_size; i++) {
         cout << i+1 << " > ";
-        temp = new_input_metod(INT_MIN+1, INT_MAX);
+        temp = new_input_metod(INT_MIN, INT_MAX);
         array.append(temp);
     }
 

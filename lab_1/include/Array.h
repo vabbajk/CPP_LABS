@@ -37,18 +37,28 @@ class MyArray {
             return result;
         }
 
-        friend MyArray operator&(const MyArray& left, const MyArray& right) {
+    friend MyArray operator&(const MyArray& left, const MyArray& right) {
             MyArray result;
+
+            bool* used = new bool[right.size];
+            for (int i = 0; i < right.size; i++) {
+                used[i] = false;
+            }
+
             for (int i = 0; i < left.size; i++) {
                 for (int j = 0; j < right.size; j++) {
-                    if (left.data[i] == right.data[j]) {
+                    if (!used[j] && left.data[i] == right.data[j]) {
                         result.append(left.data[i]);
+                        used[j] = true;
                         break;
                     }
                 }
             }
+
+            delete[] used;
             return result;
         }
+
 
         MyArray& operator=(const MyArray &other);
 

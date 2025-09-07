@@ -1,10 +1,5 @@
 #include "Header.h"
 
-#include <iostream>
-#include <string>
-#include <climits>
-#include <conio.h>
-
 using namespace std;
 
 bool check_int_1(const std::string &input, int min, int max, long long &out) {

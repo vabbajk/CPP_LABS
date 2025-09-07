@@ -1,7 +1,9 @@
 #ifndef HEADER_H
 #define HEADER_H
-#include <conio.h>
+#include <iostream>
 #include <string>
+#include <climits>
+#include <conio.h>
 
 bool check_int_1(const std::string &input, int min, int max);
 
