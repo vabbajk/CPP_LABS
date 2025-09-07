@@ -40,7 +40,7 @@ class MyArray {
     friend MyArray operator&(const MyArray& left, const MyArray& right) {
             MyArray result;
 
-            bool* used = new bool[right.size];
+            auto used = new bool[right.size];
             for (int i = 0; i < right.size; i++) {
                 used[i] = false;
             }
