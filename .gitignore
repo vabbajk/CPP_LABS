@@ -1,6 +1,0 @@
-**/cmake-build-debug/
-**/.idea/
-*.tmp
-*.log
-CMakeLists.txt
-clang-format.txt
