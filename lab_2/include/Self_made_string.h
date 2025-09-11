@@ -3,9 +3,6 @@
 
 #include <string>
 
-
-using namespace std;
-
 class String {
 
     private:
@@ -24,21 +21,46 @@ class String {
     	String(const String& other);
     	~String();
 
-
-    	friend bool operator!(const String& s);
     	String operator()(int start, int end) const;
-    	char& operator[](int index);
-    	const char& operator[](int index) const;
-    	friend bool operator==(const String& s1, const String& s2);
-
-        friend ostream& operator<<(ostream& out, const String& s);
-        friend istream& operator>>(istream& in, String& s);
-
         String& operator=(const char* str);
         String& operator=(const String& other);
+    	char& operator[](int index);
+    	const char& operator[](int index) const;
+
         int get_length() const;
         void clear() ;
         bool is_empty() const;
+
+        friend bool operator!(const String& s);
+
+        std::ostream& operator<<(std::ostream& out, const String& s) {
+            if (!s) {
+                return out;
+            }else {
+                out << s.data;
+                return out;
+            }
+        }
+
+        std::istream& operator>>(std::istream& in, String& s) {
+            std::string temp;
+            std::getline(in, temp);
+
+            delete[] s.data;
+            s.length = temp.size();
+            s.data = new char[s.length + 1];
+
+            for (int i = 0; i < s.length; i++) {
+                s.data[i] = temp[i];
+            }
+            s.data[s.length] = '\0';
+
+            return in;
+        }
+
+        friend bool operator==(const String& s1, const String& s2) {
+                return str_equal(s1.data, s2.data);
+        }
 };
 
 #endif

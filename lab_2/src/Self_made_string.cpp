@@ -30,21 +30,15 @@ bool String::str_equal(const char* s1, const char* s2) {
     return s1[i] == s2[i];
 }
 
-String::String() {
-    data = new char[1];
+String::String() : data(new char[1]), length(0) {
     data[0] = '\0';
-    length = 0;
 }
 
-String::String(const char* s) {
-    length = str_length(s);
-    data = new char[length + 1];
+String::String(const char* s) : length(str_length(s)), data(new char[length + 1]) {
     str_copy(data, s);
 }
 
-String::String(const String& other) {
-    length = other.length;
-    data = new char[length + 1];
+String::String(const String& other) : length(str_length(other.data)), data(new char[length + 1]) {
     str_copy(data, other.data);
 }
 
@@ -61,7 +55,7 @@ String String::operator()(int start, int end) const {
         return String("");
     }
 
-    char* buffer = new char[end-start + 1];
+    auto buffer = new char[end-start + 1];
     for (int i = start; i <= end; i++) {
         buffer[i] = data[i];
     }
@@ -106,28 +100,7 @@ void String::clear() {
     }
 }
 
-bool operator==(const String& s1, const String& s2) {
-    return String::str_equal(s1.data, s2.data);
-}
 
-ostream& operator<<(ostream& out, const String& s) {
-    if (!s) {
-        return out;
-    }else {
-        out << s.data;
-        return out;
-    }
-}
-
-istream& operator>>(istream& in, String& s) {
-    char buffer[1024];
-    in.getline(buffer, sizeof(buffer));
-    delete[] s.data;
-    s.length = String::str_length(buffer);
-    s.data = new char[s.length + 1];
-    String::str_copy(s.data, buffer);
-    return in;
-}
 
 
 
