@@ -33,30 +33,8 @@ class String {
 
         friend bool operator!(const String& s);
 
-        std::ostream& operator<<(std::ostream& out, const String& s) {
-            if (!s) {
-                return out;
-            }else {
-                out << s.data;
-                return out;
-            }
-        }
-
-        std::istream& operator>>(std::istream& in, String& s) {
-            std::string temp;
-            std::getline(in, temp);
-
-            delete[] s.data;
-            s.length = temp.size();
-            s.data = new char[s.length + 1];
-
-            for (int i = 0; i < s.length; i++) {
-                s.data[i] = temp[i];
-            }
-            s.data[s.length] = '\0';
-
-            return in;
-        }
+        friend std::ostream& operator<<(std::ostream& out, const String& s);
+        friend std::istream& operator>>(std::istream& in, String& s);
 
         friend bool operator==(const String& s1, const String& s2) {
                 return str_equal(s1.data, s2.data);

@@ -34,11 +34,13 @@ String::String() : data(new char[1]), length(0) {
     data[0] = '\0';
 }
 
-String::String(const char* s) : length(str_length(s)), data(new char[length + 1]) {
+String::String(const char* s) : length(str_length(s)) {
+    data = new char[length + 1];
     str_copy(data, s);
 }
 
-String::String(const String& other) : length(str_length(other.data)), data(new char[length + 1]) {
+String::String(const String& other) : length(str_length(other.data)){
+    data = new char[length + 1];
     str_copy(data, other.data);
 }
 
@@ -100,6 +102,25 @@ void String::clear() {
     }
 }
 
+std::ostream& operator<<(std::ostream& out, const String& s) {
+    if (s.data) out << s.data;
+    return out;
+}
+
+std::istream& operator>>(std::istream& in, String& s) {
+    std::string temp;
+    std::getline(in, temp);
+
+    delete[] s.data;
+    s.length = temp.size();
+    s.data = new char[s.length + 1];
+
+    for (int i = 0; i < s.length; i++)
+        s.data[i] = temp[i];
+    s.data[s.length] = '\0';
+
+    return in;
+}
 
 
 

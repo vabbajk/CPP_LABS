@@ -8,7 +8,8 @@ int main(){
 
     system("chcp 1251");
     system("cls");
-    String my_string, temp_string;
+    String my_string;
+    String temp_string;
 
     char choice;
     int running = 1;

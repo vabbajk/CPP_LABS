@@ -109,7 +109,8 @@ void print_menu() {
 
 String substr_menu(String s) {
     system("cls");
-    int x,y;
+    int x;
+    int y;
     cout << "¬ведите левую границу подстроки : ";
     x = new_input_metod(0, s.get_length()-1);
     cout << "¬ведите правую границу подстроки : ";
