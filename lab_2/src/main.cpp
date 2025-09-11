@@ -16,7 +16,7 @@ int main(){
 
     while (running) {
 
-        print_menu();
+        print_menu_2();
 
         choice = choce_task_n_to_m('0', '9');
 
