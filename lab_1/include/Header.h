@@ -11,6 +11,6 @@ int new_input_metod(int min, int max);
 
 char choce_task_n_to_m(char n, char m);
 
-void print_menu_1();
+void print_menu();
 
 #endif
