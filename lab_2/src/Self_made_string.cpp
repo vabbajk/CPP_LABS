@@ -48,10 +48,6 @@ String::~String() {
     delete[] data;
 }
 
-bool operator!(const String& s) {
-    return (s.length == 0 || s.data == nullptr);
-}
-
 String String::operator()(int start, int end) const {
     if (start < 0 || start >= length || end < start) {
         return String("");
@@ -102,25 +98,7 @@ void String::clear() {
     }
 }
 
-std::ostream& operator<<(std::ostream& out, const String& s) {
-    if (s.data) out << s.data;
-    return out;
-}
 
-std::istream& operator>>(std::istream& in, String& s) {
-    std::string temp;
-    std::getline(in, temp);
-
-    delete[] s.data;
-    s.length = temp.size();
-    s.data = new char[s.length + 1];
-
-    for (int i = 0; i < s.length; i++)
-        s.data[i] = temp[i];
-    s.data[s.length] = '\0';
-
-    return in;
-}
 
 
 
