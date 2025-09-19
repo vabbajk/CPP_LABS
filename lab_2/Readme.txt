@@ -5,3 +5,5 @@
 Перегрузить операторы !(пуст ли String), ()(int,int) – возвращение подстроки, []. 
 Предоставить конструктор копирования. 
 Определить friend функции для операций ввода-вывода в поток.
+
+https://sonarcloud.io/summary/new_code?id=vabbajk_CPP_LABS&branch=main
