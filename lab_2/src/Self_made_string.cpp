@@ -11,11 +11,11 @@ int String::str_length(const char* s) {
         return 0;
     }
 
-    int len = 0;
-    while (len < 1024 && s[len] != '\0') {
-        len++;
+    const char* ptr = s;
+    while (*ptr != '\0') {
+        ptr++;
     }
-    return len;
+    return static_cast<int>(ptr - s);
 }
 
 void String::str_copy(char* dest, const char* src, int dest_size) {
