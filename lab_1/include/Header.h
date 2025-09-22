@@ -1,11 +1,12 @@
 #ifndef HEADER_H
 #define HEADER_H
-#include <iostream>
-#include <string>
-#include <climits>
 #include <conio.h>
 
-bool check_int_1(const std::string &input, int min, int max);
+#include <climits>
+#include <iostream>
+#include <string>
+
+bool check_int_1(const std::string& input, int min, int max);
 
 int new_input_metod(int min, int max);
 

@@ -1,12 +1,14 @@
 #ifndef HEADER_H
 #define HEADER_H
-#include "Self_made_string.h"
-#include <iostream>
-#include <string>
-#include <climits>
 #include <conio.h>
 
-bool check_int_1(const std::string &input, int min, int max, long long &out);
+#include <climits>
+#include <iostream>
+#include <string>
+
+#include "Self_made_string.h"
+
+bool check_int_1(const std::string& input, int min, int max, long long& out);
 
 int new_input_metod(int min, int max);
 
@@ -16,23 +18,23 @@ void print_menu_2();
 
 String substr_menu(String s);
 
-void input_string(String &my_string);
+void input_string(String& my_string);
 
-void print_string(const String &my_string);
+void print_string(const String& my_string);
 
-void clear_string(String &my_string);
+void clear_string(String& my_string);
 
-void check_empty(const String &my_string);
+void check_empty(const String& my_string);
 
-void print_substring(const String &my_string);
+void print_substring(const String& my_string);
 
-void print_char_by_index(const String &my_string);
+void print_char_by_index(const String& my_string);
 
-void copy_string(const String &src, String &dest);
+void copy_string(const String& src, String& dest);
 
-void print_temp_string(const String &temp_string);
+void print_temp_string(const String& temp_string);
 
-void clear_temp_string(String &temp_string);
+void clear_temp_string(String& temp_string);
 
 void run_menu();
 

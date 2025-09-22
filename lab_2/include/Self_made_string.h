@@ -1,11 +1,12 @@
 #ifndef SELF_MADE_STRING_H
 #define SELF_MADE_STRING_H
 
-#include <string>
 #include <iostream>
+#include <string>
 
-class String {
-private:
+class String
+{
+   private:
     char* data;
     int length;
 
@@ -13,7 +14,7 @@ private:
     static void str_copy(char* dest, const char* src, int dest_size);
     static bool str_equal(const char* s1, const char* s2);
 
-public:
+   public:
     String();
     explicit String(const char* s);
     String(const String& other);
@@ -29,20 +30,23 @@ public:
     void clear();
     bool is_empty() const;
 
-    friend bool operator!(const String& s) {
-        return s.length == 0 || s.data == nullptr;
-    }
+    friend bool operator!(const String& s) { return s.length == 0 || s.data == nullptr; }
 
-    friend std::ostream& operator<<(std::ostream& out, const String& s) {
-        if (s.data) {
+    friend std::ostream& operator<<(std::ostream& out, const String& s)
+    {
+        if (s.data)
+        {
             out << (s.data);
-        }else {
+        }
+        else
+        {
             out << "Строка пуста!";
         }
         return out;
     }
 
-    friend std::istream& operator>>(std::istream& in, String& s) {
+    friend std::istream& operator>>(std::istream& in, String& s)
+    {
         std::string temp;
         std::getline(in, temp);
 
@@ -57,10 +61,10 @@ public:
         return in;
     }
 
-    friend bool operator==(const String& s1, const String& s2) {
+    friend bool operator==(const String& s1, const String& s2)
+    {
         return str_equal(s1.data, s2.data);
     }
 };
-
 
 #endif

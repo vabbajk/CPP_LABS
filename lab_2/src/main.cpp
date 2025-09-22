@@ -1,10 +1,12 @@
 #include <iostream>
-#include "../include/Self_made_string.h"
+
 #include "../include/Header.h"
+#include "../include/Self_made_string.h"
 
 using namespace std;
 
-int main() {
+int main()
+{
     system("chcp 1251");
     system("cls");
 
@@ -14,11 +16,13 @@ int main() {
     char choice;
     int running = 1;
 
-    while (running) {
+    while (running)
+    {
         print_menu_2();
         choice = choce_task_n_to_m('0', '9');
 
-        switch (choice) {
+        switch (choice)
+        {
             case '1':
                 input_string(my_string);
                 break;
@@ -49,7 +53,8 @@ int main() {
             case '0':
                 running = 0;
                 break;
-            default: break;
+            default:
+                break;
         }
         system("cls");
     }

@@ -1,19 +1,23 @@
+#include "Array.h"
+
 #include <iomanip>
 #include <iostream>
-#include "Array.h"
 
 #include "Header.h"
 
 using namespace std;
 
-int MyArray::allocate_memory() {
-    if (size <= 0) {
+int MyArray::allocate_memory()
+{
+    if (size <= 0)
+    {
         data = nullptr;
         return -1;
     }
 
     data = new (std::nothrow) int[size];
-    if (data == nullptr) {
+    if (data == nullptr)
+    {
         std::cerr << "Ошибка выделения памяти!" << std::endl;
         exit(1);
     }
@@ -21,38 +25,40 @@ int MyArray::allocate_memory() {
     return 0;
 }
 
-int MyArray::free_memory() {
-    if (data != nullptr) {
+int MyArray::free_memory()
+{
+    if (data != nullptr)
+    {
         delete[] data;
         data = nullptr;
     }
     return 0;
 }
 
-MyArray::MyArray() : size(0), data(nullptr) {
-}
+MyArray::MyArray() : size(0), data(nullptr) {}
 
-MyArray::MyArray(int size)  : size(size) {
-    allocate_memory();
-}
+MyArray::MyArray(int size) : size(size) { allocate_memory(); }
 
-MyArray::MyArray(const MyArray& other)
-    : size(other.size),
-      data(new int[size]) {
-
-    for (int i = 0; i < size; i++) {
+MyArray::MyArray(const MyArray& other) : size(other.size), data(new int[size])
+{
+    for (int i = 0; i < size; i++)
+    {
         data[i] = other.data[i];
     }
 }
 
-MyArray::~MyArray() {
-    if (data != nullptr) {
+MyArray::~MyArray()
+{
+    if (data != nullptr)
+    {
         free_memory();
     }
 }
 
-MyArray& MyArray::operator=(const MyArray& other) {
-    if (this == &other) {
+MyArray& MyArray::operator=(const MyArray& other)
+{
+    if (this == &other)
+    {
         return *this;
     }
 
@@ -60,57 +66,70 @@ MyArray& MyArray::operator=(const MyArray& other) {
     size = other.size;
     data = new int[size];
 
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++)
+    {
         data[i] = other.data[i];
     }
 
     return *this;
 }
 
-int MyArray::equalize(const int* arr, int other_size) {
-    if (data != nullptr) {
+int MyArray::equalize(const int* arr, int other_size)
+{
+    if (data != nullptr)
+    {
         free_memory();
     }
 
     size = other_size;
-    if (size > 0) {
+    if (size > 0)
+    {
         allocate_memory();
-        for (int i = 0; i < size; ++i) {
+        for (int i = 0; i < size; ++i)
+        {
             data[i] = arr[i];
         }
-    } else {
+    }
+    else
+    {
         data = nullptr;
     }
 
     return 0;
 }
 
-void MyArray::print() const {
-    if (data == nullptr || size == 0) {
+void MyArray::print() const
+{
+    if (data == nullptr || size == 0)
+    {
         std::cout << "Массив пуст! " << std::endl;
         return;
     }
-    
-    for (int i = 0; i < size; i++) {
+
+    for (int i = 0; i < size; i++)
+    {
         std::cout << data[i] << " ";
     }
     std::cout << std::endl;
 }
 
-int MyArray::append(int value) {
-
+int MyArray::append(int value)
+{
     auto temp = new int[size + 1];
 
-    if (temp==nullptr) {
+    if (temp == nullptr)
+    {
         exit(1);
     }
 
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++)
+    {
         temp[i] = data[i];
     }
     temp[size] = value;
 
-    if (data != nullptr) {
+    if (data != nullptr)
+    {
         delete[] data;
     }
     data = temp;
@@ -119,28 +138,26 @@ int MyArray::append(int value) {
     return 0;
 }
 
-void MyArray::clear() {
+void MyArray::clear()
+{
     delete[] data;
     data = nullptr;
     size = 0;
 }
 
-int MyArray::get_size() const {
-    return size;
-}
+int MyArray::get_size() const { return size; }
 
-void input_array(MyArray & array) {
+void input_array(MyArray& array)
+{
     cout << "Введите количество добавляемых элементов: ";
 
     int array_size = new_input_metod(0, INT_MAX);
     int temp;
 
-    for (int i = 0; i < array_size; i++) {
-        cout << i+1 << " > ";
+    for (int i = 0; i < array_size; i++)
+    {
+        cout << i + 1 << " > ";
         temp = new_input_metod(INT_MIN, INT_MAX);
         array.append(temp);
     }
-
 }
-
-

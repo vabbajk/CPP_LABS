@@ -13,12 +13,12 @@ int main() {
 
         cout << "Лабораторная работа N2, Вариант 2" << endl;
 
-        Shape* fig1 = choose_figure("Выбор первой фигуры");
+        Shape *fig1 = choose_figure("Выбор первой фигуры");
         if (!fig1) {
             exit(1);
         }
 
-        Shape* fig2 = choose_figure("Выбор второй фигуры");
+        Shape *fig2 = choose_figure("Выбор второй фигуры");
         if (!fig2) {
             delete fig1;
             exit(1);

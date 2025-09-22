@@ -1,11 +1,12 @@
 #include <iostream>
+
 #include "Array.h"
 #include "Header.h"
 
 using namespace std;
 
-int main(){
-
+int main()
+{
     setlocale(LC_ALL, "Russian");
 
     char choice;
@@ -15,13 +16,14 @@ int main(){
     MyArray second_array;
     MyArray result_array;
 
-    while (running) {
-
+    while (running)
+    {
         print_menu();
 
         choice = choce_task_n_to_m('0', '8');
         system("cls");
-        switch (choice) {
+        switch (choice)
+        {
             case '1':
                 input_array(first_array);
                 break;
@@ -69,5 +71,4 @@ int main(){
         }
         system("cls");
     }
-
 }

@@ -1,12 +1,12 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-#include <iostream>
-#include <string>
 #include <climits>
 #include <conio.h>
-#include "Shape.h"
+#include <iostream>
+#include <string>
 #include "Circle.h"
+#include "Shape.h"
 #include "Square.h"
 #include "Triangle.h"
 
@@ -18,6 +18,6 @@ char choce_task_n_to_m(char n, char m);
 
 void print_menu();
 
-Shape* choose_figure(const std::string& displays_text);
+Shape *choose_figure(const std::string &displays_text);
 
 #endif
