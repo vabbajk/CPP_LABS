@@ -23,7 +23,6 @@ public:
     String& operator=(const char* str);
     String& operator=(const String& other);
 
-    char& operator[](int index);
     const char& operator[](int index) const;
 
     int get_length() const;
@@ -37,6 +36,8 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const String& s) {
         if (s.data) {
             out << (s.data);
+        }else {
+            out << "Строка пуста!";
         }
         return out;
     }

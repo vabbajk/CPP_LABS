@@ -49,23 +49,21 @@ String::~String() {
 }
 
 String String::operator()(int start, int end) const {
-    if (start < 0 || start >= length || end < start) {
+    if (start < 0 || start >= length || end < start || end >= length) {
         return String("");
     }
 
-    auto buffer = new char[end-start + 1];
-    for (int i = start; i <= end; i++) {
-        buffer[i] = data[i];
+    int diff = end - start + 1;
+    auto buffer = new char[diff + 1];
+
+    for (int i = 0; i < diff; i++) {
+        buffer[i] = data[start + i];
     }
-    buffer[end+1] = '\0';
+    buffer[diff] = '\0';
 
     String result(buffer);
     delete[] buffer;
     return result;
-}
-
-char& String::operator[](int index) {
-    return data[index];
 }
 
 const char& String::operator[](int index) const {

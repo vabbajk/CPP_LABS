@@ -92,20 +92,6 @@ char choce_task_n_to_m(char n, char m)  {
     return c;
 }
 
-void print_menu_1() {
-    cout << "Лабораторная работа N1, Вариант 2\n" << endl;
-    cout << "Нажмите :" << endl;
-    cout << "1 для добавления элементов в первый массив" << endl;
-    cout << "2 для добавления элементов в второй массив" << endl;
-    cout << "3 для очистки первого массива" << endl;
-    cout << "4 для очистки второго массива" << endl;
-    cout << "5 для вывода пересечения массивов" << endl;
-    cout << "6 для вывода суммы массивов" << endl;
-    cout << "7 для вывода первого массива" << endl;
-    cout << "8 для вывода второго массива" << endl;
-    cout << "0 для выхода \n > ";
-}
-
 void print_menu_2() {
     cout << "Лабораторная работа N2, Вариант 2\n" << endl;
     cout << "Нажмите :" << endl;
@@ -131,3 +117,68 @@ String substr_menu(String s) {
     y = new_input_metod(x, s.get_length()-1);
     return s(x,y);
 }
+
+void input_string(String &my_string) {
+    system("cls");
+    cout << "Введите строку : ";
+    cin >> my_string;
+}
+
+void print_string(const String &my_string) {
+    system("cls");
+    cout << my_string << endl;
+    system("pause");
+}
+
+void clear_string(String &my_string) {
+    my_string.clear();
+}
+
+void check_empty(const String &my_string) {
+    system("cls");
+    if (!my_string) {
+        cout << "Строка пуста!" << endl;
+    } else {
+        cout << "В строке есть символы! Вот они : " << my_string << endl;
+    }
+    system("pause");
+}
+
+void print_substring(const String &my_string) {
+    system("cls");
+    if (!my_string) {
+        cout << "Строка пустая." << endl;
+        system("pause");
+        return;
+    }
+    cout << substr_menu(my_string) << endl;
+    system("pause");
+}
+
+void print_char_by_index(const String &my_string) {
+    system("cls");
+    if (!my_string) {
+        cout << "Строка пустая." << endl;
+        system("pause");
+        return;
+    }
+    cout << "Введите индекс: ";
+    int i = new_input_metod(0, my_string.get_length() - 1);
+    cout << "Вот символ " << i << " - " << my_string[i] << endl;
+    system("pause");
+}
+
+void copy_string(const String &src, String &dest) {
+    dest = src;
+}
+
+void print_temp_string(const String &temp_string) {
+    system("cls");
+    cout << temp_string << endl;
+    system("pause");
+}
+
+void clear_temp_string(String &temp_string) {
+    temp_string.clear();
+}
+

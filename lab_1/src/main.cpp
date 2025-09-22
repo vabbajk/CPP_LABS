@@ -51,7 +51,7 @@ int main(){
             case '7':
                 system("cls");
                 first_array.print();
-            second_array.print();
+                second_array.print();
                 system("pause");
                 break;
             case '8':
