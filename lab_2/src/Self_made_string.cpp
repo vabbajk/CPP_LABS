@@ -12,6 +12,7 @@ int String::str_length(const char* s) {
     if (!s) return 0;
 
     const size_t MAX_LEN = 1024;
+    
     size_t i = 0;
     for (; i < MAX_LEN && s[i] != '\0'; ++i);
     return static_cast<int>(i);
