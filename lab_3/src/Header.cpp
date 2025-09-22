@@ -115,6 +115,7 @@ Shape* choose_figure(const string& displays_text) {
             return new Triangle();
         case '0':
             return nullptr;
+        default:
+            return nullptr;
     }
-    return nullptr;
 }

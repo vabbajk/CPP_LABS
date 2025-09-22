@@ -9,7 +9,7 @@ class Triangle;
 
 class Shape {
 public:
-    virtual ~Shape() {}
+    virtual ~Shape() = default;
 
 
     virtual bool intersect(Shape* other) = 0;
