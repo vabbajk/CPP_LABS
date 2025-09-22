@@ -9,10 +9,13 @@ using namespace std;
 
 
 int String::str_length(const char* s) {
-    if (!s) return 0; 
-    return static_cast<int>(strlen(s));
-}
+    if (!s) return 0;
 
+    const size_t MAX_LEN = 1024;
+    size_t i = 0;
+    for (; i < MAX_LEN && s[i] != '\0'; ++i);
+    return static_cast<int>(i);
+}
 
 void String::str_copy(char* dest, const char* src, int dest_size) {
     if (dest == nullptr || src == nullptr || dest_size == 0) {
