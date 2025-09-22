@@ -12,9 +12,16 @@ int String::str_length(const char* s) {
     }
 
     const char* ptr = s;
-    while (*ptr != '\0') {
+    size_t count = 0;
+
+    while (count < 1024) {
+        if (*ptr == '\0') {
+            break;
+        }
         ptr++;
+        count++;
     }
+
     return static_cast<int>(ptr - s);
 }
 
