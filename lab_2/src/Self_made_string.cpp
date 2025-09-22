@@ -3,6 +3,8 @@
 #include "../include/Self_made_string.h"
 #include "../include/Header.h"
 
+#include <string.h>
+
 using namespace std;
 
 
@@ -10,19 +12,7 @@ int String::str_length(const char* s) {
     if (s == nullptr) {
         return 0;
     }
-
-    const char* ptr = s;
-    size_t count = 0;
-
-    while (count < 1024) {
-        if (*ptr == '\0') {
-            break;
-        }
-        ptr++;
-        count++;
-    }
-
-    return static_cast<int>(ptr - s);
+    return static_cast<int>(strlen(s));
 }
 
 void String::str_copy(char* dest, const char* src, int dest_size) {
