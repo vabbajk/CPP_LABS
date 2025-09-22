@@ -1,5 +1,5 @@
 # Лабораторная работа №3
-## Вариант №…
+## Вариант №2
 
 **Выполнил:** студент группы 450503 Аксёненко Валерий
 
@@ -18,3 +18,4 @@
 
 ### Ссылка на SonarCloud:
 [https://sonarcloud.io/summary/new_code?id=vabbajk_CPP_LABS&branch=main](https://sonarcloud.io/summary/new_code?id=vabbajk_CPP_LABS&branch=main)
+
