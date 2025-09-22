@@ -10,7 +10,7 @@ private:
     int length;
 
     static int str_length(const char* s);
-    static void str_copy(char* dest, const char* src);
+    static void str_copy(char* dest, const char* src, int dest_size);
     static bool str_equal(const char* s1, const char* s2);
 
 public:
