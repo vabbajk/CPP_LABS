@@ -11,7 +11,7 @@ char choceTaskNtoM(char n, char m) {
 }
 
 void printMenu() {
-    cout << "Выберите :\n";
+    cout << "Выберите :\n"; 
     cout << "1 - Круг\n";
     cout << "2 - Квадрат\n";
     cout << "3 - Треугольник\n";
