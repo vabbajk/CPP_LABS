@@ -10,14 +10,10 @@
 #include "Square.h"
 #include "Triangle.h"
 
-bool check_int_1(const std::string &input, int min, int max, long long &out);
+char choseTaskNtoM(char n, char m);
 
-int new_input_metod(int min, int max);
+void printMenu();
 
-char choce_task_n_to_m(char n, char m);
-
-void print_menu();
-
-Shape *choose_figure(const std::string &displays_text);
+Shape *chooseFigure(const std::string &displays_text);
 
 #endif
