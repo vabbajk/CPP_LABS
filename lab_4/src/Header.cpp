@@ -7,7 +7,6 @@
 #include <iostream>
 #include <limits>
 #include <span>
-#include <vector>
 
 using namespace std;
 
@@ -207,7 +206,7 @@ void addShape(Shape **shapes, int &size, int capacity) {
     system("pause");
 }
 
-void showAllShapes(std::span<Shape *const> shapes) {
+void showAllShapes(std::span<Shape *> shapes) {
     if (shapes.empty()) {
         cout << "Массив пуст. Сначала добавьте фигуры.\n";
     } else {
@@ -225,7 +224,7 @@ void showAllShapes(std::span<Shape *const> shapes) {
     system("pause");
 }
 
-void showShapeByIndex(std::span<Shape *const> shapes) {
+void showShapeByIndex(std::span<Shape *> shapes) {
     if (shapes.empty()) {
         cout << "Массив пуст. Сначала добавьте фигуры.\n";
         system("pause");
