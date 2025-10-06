@@ -2,7 +2,7 @@
 
 using namespace std;
 
-char choceTaskNtoM(char n, char m) {
+char chooseTaskNtoM(char n, char m) {
     char c = 'l';
     while (c < n || c > m) {
         c = _getch();
@@ -22,7 +22,7 @@ void printMenu() {
 Shape *chooseFigure(const string &displays_text) {
     cout << "\n--- " << displays_text << " ---\n";
     printMenu();
-    char choice = choceTaskNtoM('0', '3');
+    char choice = chooseTaskNtoM('0', '3');
     cout << choice << endl;
     switch (choice) {
         case '1':
