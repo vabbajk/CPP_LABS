@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-using namespace std;
+
 
 
 template <typename T>
@@ -21,6 +21,12 @@ private:
 public:
     Queue();
     ~Queue();
+
+    Queue(const Queue& other);
+    Queue& operator=(const Queue& other);
+
+    Queue(Queue&& other) noexcept;
+    Queue& operator=(Queue&& other) noexcept;
 
     bool isEmpty() const;
     void enqueue(const T& value);

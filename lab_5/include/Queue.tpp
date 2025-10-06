@@ -2,7 +2,7 @@
 #define QUEUE_TPP
 
 #include "Queue.h"
-#include <iostream>
+using namespace std;
 
 template <typename T>
 Node<T>::Node(const T& value) : data(value), next(nullptr) {}
@@ -16,6 +16,55 @@ Queue<T>::~Queue() {
         dequeue();
     }
 }
+
+template <typename T>
+Queue<T>::Queue(const Queue& other) : front(nullptr), rear(nullptr), count(0) {
+    Node<T>* current = other.front;
+    while (current) {
+        enqueue(current->data);
+        current = current->next;
+    }
+}
+
+template <typename T>
+Queue<T>& Queue<T>::operator=(const Queue& other) {
+    if (this == &other) return *this;
+
+    while (!isEmpty()) dequeue();
+
+    Node<T>* current = other.front;
+    while (current) {
+        enqueue(current->data);
+        current = current->next;
+    }
+    return *this;
+}
+
+template <typename T>
+Queue<T>::Queue(Queue&& other) noexcept
+    : front(other.front), rear(other.rear), count(other.count) {
+    other.front = nullptr;
+    other.rear = nullptr;
+    other.count = 0;
+}
+
+template <typename T>
+Queue<T>& Queue<T>::operator=(Queue&& other) noexcept {
+    if (this == &other) return *this;
+
+    while (!isEmpty()) dequeue();
+
+    front = other.front;
+    rear = other.rear;
+    count = other.count;
+
+    other.front = nullptr;
+    other.rear = nullptr;
+    other.count = 0;
+
+    return *this;
+}
+
 
 template <typename T>
 bool Queue<T>::isEmpty() const {

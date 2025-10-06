@@ -137,8 +137,7 @@ void handleIntQueue(Queue<int>& q) {
 
             case '1': {
                 cout << "Введите число для добавления: ";
-                int val = secureInputMethod(INT_MIN+1, INT_MAX);
-                if (val != INT_MIN) {
+                if (int val = secureInputMethod(INT_MIN+1, INT_MAX); val != INT_MIN) {
                     q.enqueue(val);
                     cout << "Добавлено!\n";
                 } else cout << "Отмена ввода.\n";
@@ -160,6 +159,8 @@ void handleIntQueue(Queue<int>& q) {
                 q.print();
                 system("pause");
                 break;
+            default:
+                cout << "Эта шо, ты как сюда залез :D ??? " << endl;
         }
     }
 }
@@ -202,6 +203,8 @@ void handleStringQueue(Queue<string>& q) {
                 q.print();
                 system("pause");
                 break;
+            default:
+                cout << "Эта шо, ты как сюда залез :D ??? " << endl;
         }
     }
 }
@@ -228,8 +231,12 @@ void handleDoubleQueue(Queue<double>& q) {
                     double val = stod(s);
                     q.enqueue(val);
                     cout << "Добавлено!\n";
-                } catch (...) {
+                }
+                catch (const invalid_argument&) {
                     cout << "Ошибка: некорректное число.\n";
+                }
+                catch (const out_of_range&) {
+                    cout << "Ошибка: число вне диапазона double.\n";
                 }
                 system("pause");
                 break;
@@ -249,6 +256,8 @@ void handleDoubleQueue(Queue<double>& q) {
                 q.print();
                 system("pause");
                 break;
+            default:
+                cout << "Эта шо, ты как сюда залез :D ??? " << endl;
         }
     }
 }
