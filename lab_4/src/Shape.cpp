@@ -1,5 +1,7 @@
 #include "../include/Shape.h"
 
+using namespace std;
+
 Shape::Shape(const string& name) : name(name) {}
 
 Shape::~Shape() = default;

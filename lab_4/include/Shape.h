@@ -2,16 +2,14 @@
 #include <string>
 #include <iostream>
 
-using namespace std;
-
 class Shape {
-protected:
-    string name;
+private:
+    std::string name;
 public:
-    Shape(const string& name);
+    explicit Shape(const std::string& name);
     virtual ~Shape();
 
     virtual double area() const = 0;
     virtual void print() const;
-    const string& getName() const;
+    const std::string& getName() const;
 };

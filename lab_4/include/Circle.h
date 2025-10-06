@@ -5,7 +5,7 @@ class Circle : public Shape {
 private:
     double radius;
 public:
-    Circle(double radius);
+    explicit Circle(double radius);
     ~Circle() override = default;
 
     double area() const override;

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <limits>
 #include <vector>
+#include <span>
 
 using namespace std;
 
@@ -208,8 +209,8 @@ void addShape(Shape** shapes, int& size, int capacity) {
         system("pause");
         return;
     }
-    Shape* fig = chooseFigure("Добавление фигуры");
-    if (fig) {
+
+    if (Shape* fig = chooseFigure("Добавление фигуры")) {
         shapes[size++] = fig;
         cout << "Фигура добавлена.\n";
     } else {
@@ -218,41 +219,37 @@ void addShape(Shape** shapes, int& size, int capacity) {
     system("pause");
 }
 
-void showAllShapes(Shape** shapes, int size) {
-    if (size == 0) {
+void showAllShapes(std::span<Shape*> shapes) {
+    if (shapes.empty()) {
         cout << "Массив пуст. Сначала добавьте фигуры.\n";
     } else {
         cout << "Содержимое массива фигур:\n";
-        for (int i = 0; i < size; ++i) {
-            cout << i + 1 << ") ";
-            shapes[i]->print();
-            cout << " -> S = " << shapes[i]->area() << '\n';
+        int index = 1;
+        for (Shape* s : shapes) {
+            if (s) {
+                cout << index++ << ") ";
+                s->print();
+                cout << " -> S = " << s->area() << '\n';
+            }
         }
     }
     system("pause");
 }
-
-void showShapeByIndex(Shape** shapes, int size) {
-    if (size == 0) {
+void showShapeByIndex(span<Shape*> shapes) {
+    if (shapes.empty()) {
         cout << "Массив пуст. Сначала добавьте фигуры.\n";
         system("pause");
         return;
     }
 
-    cout << "Введите индекс элемента (0.." << size-1 << "): ";
-    int idx = secureInputMethod(0, size-1);
-    if (idx == INT_MIN) {
-        cout << "Отмена.\n";
-        system("pause");
-        return;
-    }
-    if (idx >= 1 && idx <= size) {
-        Shape* s = shapes[idx - 1];
-        s->print();
-        cout << " -> S = " << s->area() << '\n';
-    } else {
-        cout << "Некорректный индекс.\n";
-    }
+    cout << "Введите индекс элемента (0.." << shapes.size() - 1 << "): ";
+
+    int idx;
+    idx = secureInputMethod(0, shapes.size() - 1);
+
+    Shape* s = shapes[idx];
+    s->print();
+    cout << " -> S = " << s->area() << '\n';
+
     system("pause");
 }
-
