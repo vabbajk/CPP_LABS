@@ -227,7 +227,8 @@ void showAllShapes(std::span<Shape* const> shapes) {
         int index = 1;
         for (const Shape* s : shapes) {
             if (s) {
-                cout << index++ << ") ";
+                cout << index << ") ";
+                index++;
                 s->print();
                 cout << " -> S = " << s->area() << '\n';
             }
@@ -252,9 +253,7 @@ void showShapeByIndex(std::span<Shape* const> shapes) {
         return;
     }
 
-    const Shape* s = shapes[idx];
-
-    if (s) {
+    if (const Shape* s = shapes[idx]) {
         s->print();
         cout << " -> S = " << s->area() << '\n';
     } else {
