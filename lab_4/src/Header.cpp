@@ -1,26 +1,24 @@
 #include "../include/Header.h"
-#include "../include/Rectangle.h"
 #include "../include/Circle.h"
+#include "../include/Rectangle.h"
 #include "../include/RightAngledTriangle.h"
 #include "../include/Trapezoid.h"
 
 #include <iostream>
 #include <limits>
-#include <vector>
 #include <span>
+#include <vector>
 
 using namespace std;
 
-bool checkIntToValid(const string& input, int min, int max, long long& out)
-{
+bool checkIntToValid(const string &input, int min, int max, long long &out) {
     if (input.empty())
         return false;
 
     int pos = 0;
     bool is_negative = false;
 
-    if (input[0] == '-')
-    {
+    if (input[0] == '-') {
         if (min >= 0)
             return false;
         is_negative = true;
@@ -30,8 +28,7 @@ bool checkIntToValid(const string& input, int min, int max, long long& out)
     }
 
     long long result = 0;
-    for (; pos < input.size(); ++pos)
-    {
+    for (; pos < input.size(); ++pos) {
         if (input[pos] < '0' || input[pos] > '9')
             return false;
         int digit = input[pos] - '0';
@@ -52,39 +49,33 @@ bool checkIntToValid(const string& input, int min, int max, long long& out)
     return true;
 }
 
-int secureInputMethod(int min, int max)
-{
+int secureInputMethod(int min, int max) {
     string line;
     long long value = 0;
 
-    while (true)
-    {
+    while (true) {
         char key = _getch();
 
-        switch (key)
-        {
+        switch (key) {
             case 27:
                 return INT_MIN;
 
             case ' ':
-                if (!line.empty() && line.back() != ' ' && line.back() != '-')
-                {
+                if (!line.empty() && line.back() != ' ' && line.back() != '-') {
                     line.push_back(' ');
                     cout << ' ';
                 }
                 break;
 
             case '-':
-                if (line.empty() || line.back() == ' ')
-                {
+                if (line.empty() || line.back() == ' ') {
                     line.push_back('-');
                     cout << '-';
                 }
                 break;
 
             case '\b':
-                if (!line.empty())
-                {
+                if (!line.empty()) {
                     cout << "\b \b";
                     line.pop_back();
                 }
@@ -92,16 +83,14 @@ int secureInputMethod(int min, int max)
 
             case '\r':
             case '\n':
-                if (!line.empty() && line.back() != '-' && checkIntToValid(line, min, max, value))
-                {
+                if (!line.empty() && line.back() != '-' && checkIntToValid(line, min, max, value)) {
                     cout << endl;
-                    return static_cast<int>(value);
+                    return value;
                 }
                 break;
 
             default:
-                if (key >= '0' && key <= '9')
-                {
+                if (key >= '0' && key <= '9') {
                     line.push_back(key);
                     cout << key;
                 }
@@ -110,11 +99,9 @@ int secureInputMethod(int min, int max)
     }
 }
 
-char chooseTaskNtoM(char n, char m)
-{
+char chooseTaskNtoM(char n, char m) {
     char c = 'l';
-    while (c < n || c > m)
-    {
+    while (c < n || c > m) {
         c = _getch();
     }
     return c;
@@ -130,7 +117,7 @@ void printMenu() {
     cout << "Ваш выбор: ";
 }
 
-static double getPositiveDouble(const string& prompt) {
+static double getPositiveDouble(const string &prompt) {
     double v;
     while (true) {
         cout << prompt;
@@ -144,7 +131,7 @@ static double getPositiveDouble(const string& prompt) {
     }
 }
 
-Shape* chooseFigure(const string& title) {
+Shape *chooseFigure(const string &title) {
     cout << "=== " << title << " ===\n";
     cout << "1) Прямоугольник\n";
     cout << "2) Круг\n";
@@ -186,7 +173,7 @@ Shape* chooseFigure(const string& title) {
 
 void testArray() {
     const int capacity = 4;
-    Shape* arr[capacity];
+    Shape *arr[capacity];
     int size = 0;
     arr[size++] = new Rectangle(2.0, 3.0);
     arr[size++] = new Circle(1.0);
@@ -195,22 +182,23 @@ void testArray() {
 
     cout << "Демонстрационный массив указателей на Shape:\n";
     for (int i = 0; i < size; ++i) {
-        cout << i+1 << ") ";
+        cout << i + 1 << ") ";
         arr[i]->print();
         cout << " -> S = " << arr[i]->area() << '\n';
     }
 
-    for (int i = 0; i < size; ++i) delete arr[i];
+    for (int i = 0; i < size; ++i)
+        delete arr[i];
 }
 
-void addShape(Shape** shapes, int& size, int capacity) {
+void addShape(Shape **shapes, int &size, int capacity) {
     if (size >= capacity) {
         cout << "Массив переполнен.\n";
         system("pause");
         return;
     }
 
-    if (Shape* fig = chooseFigure("Добавление фигуры")) {
+    if (Shape *fig = chooseFigure("Добавление фигуры")) {
         shapes[size++] = fig;
         cout << "Фигура добавлена.\n";
     } else {
@@ -219,13 +207,13 @@ void addShape(Shape** shapes, int& size, int capacity) {
     system("pause");
 }
 
-void showAllShapes(std::span<Shape* const> shapes) {
+void showAllShapes(std::span<Shape *const> shapes) {
     if (shapes.empty()) {
         cout << "Массив пуст. Сначала добавьте фигуры.\n";
     } else {
         cout << "Содержимое массива фигур:\n";
         int index = 1;
-        for (const Shape* s : shapes) {
+        for (const Shape *s: shapes) {
             if (s) {
                 cout << index << ") ";
                 index++;
@@ -237,7 +225,7 @@ void showAllShapes(std::span<Shape* const> shapes) {
     system("pause");
 }
 
-void showShapeByIndex(std::span<Shape* const> shapes) {
+void showShapeByIndex(std::span<Shape *const> shapes) {
     if (shapes.empty()) {
         cout << "Массив пуст. Сначала добавьте фигуры.\n";
         system("pause");
@@ -245,7 +233,7 @@ void showShapeByIndex(std::span<Shape* const> shapes) {
     }
 
     cout << "Введите индекс элемента (0.." << shapes.size() - 1 << "): ";
-    int idx = secureInputMethod(0, static_cast<int>(shapes.size() - 1));
+    int idx = secureInputMethod(0, shapes.size() - 1);
 
     if (idx == INT_MIN) {
         cout << "Отмена.\n";
@@ -253,7 +241,7 @@ void showShapeByIndex(std::span<Shape* const> shapes) {
         return;
     }
 
-    if (const Shape* s = shapes[idx]) {
+    if (const Shape *s = shapes[idx]) {
         s->print();
         cout << " -> S = " << s->area() << '\n';
     } else {

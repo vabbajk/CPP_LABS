@@ -3,13 +3,8 @@
 
 using namespace std;
 
-Rectangle::Rectangle(double width, double height)
-    : Shape("Прямоугольник"), width(width), height(height) {}
+Rectangle::Rectangle(double width, double height) : Shape("Прямоугольник"), width(width), height(height) {}
 
-double Rectangle::area() const {
-    return width * height;
-}
+double Rectangle::area() const { return width * height; }
 
-void Rectangle::print() const {
-    cout << getName() << " (Ширина = " << width << ", Высота = " << height << ")";
-}
+void Rectangle::print() const { cout << getName() << " (Ширина = " << width << ", Высота = " << height << ")"; }

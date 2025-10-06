@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 
-bool check_int_1(const std::string& input, int min, int max);
+bool check_int_1(const std::string &input, int min, int max);
 
 int new_input_metod(int min, int max);
 

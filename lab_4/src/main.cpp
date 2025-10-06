@@ -10,7 +10,7 @@ int main() {
     system("chcp 1251");
     system("cls");
 
-    Shape* shapes[CAPACITY] = { nullptr };
+    Shape *shapes[CAPACITY] = {nullptr};
     int size = 0;
     bool running = true;
 
@@ -21,34 +21,34 @@ int main() {
         char choice = chooseTaskNtoM('0', '4');
         system("cls");
 
-        span<Shape*> spanShapes(shapes, size);
+        span<Shape *> spanShapes(shapes, size);
 
         switch (choice) {
             case '1':
                 addShape(shapes, size, CAPACITY);
-            break;
+                break;
 
             case '2':
                 showAllShapes(spanShapes);
-            break;
+                break;
 
             case '3':
                 showShapeByIndex(spanShapes);
-            break;
+                break;
 
             case '4':
                 testArray();
-            system("pause");
-            break;
+                system("pause");
+                break;
 
             case '0':
                 running = false;
-            break;
+                break;
 
             default:
                 cout << "Некорректный выбор\n";
-            system("pause");
-            break;
+                system("pause");
+                break;
         }
     }
 
