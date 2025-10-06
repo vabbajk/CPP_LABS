@@ -219,13 +219,13 @@ void addShape(Shape** shapes, int& size, int capacity) {
     system("pause");
 }
 
-void showAllShapes(std::span<Shape*> shapes) {
+void showAllShapes(std::span<Shape* const> shapes) {
     if (shapes.empty()) {
         cout << "Массив пуст. Сначала добавьте фигуры.\n";
     } else {
         cout << "Содержимое массива фигур:\n";
         int index = 1;
-        for (Shape* s : shapes) {
+        for (const Shape* s : shapes) {
             if (s) {
                 cout << index++ << ") ";
                 s->print();
@@ -235,7 +235,8 @@ void showAllShapes(std::span<Shape*> shapes) {
     }
     system("pause");
 }
-void showShapeByIndex(span<Shape*> shapes) {
+
+void showShapeByIndex(std::span<Shape* const> shapes) {
     if (shapes.empty()) {
         cout << "Массив пуст. Сначала добавьте фигуры.\n";
         system("pause");
@@ -243,13 +244,22 @@ void showShapeByIndex(span<Shape*> shapes) {
     }
 
     cout << "Введите индекс элемента (0.." << shapes.size() - 1 << "): ";
+    int idx = secureInputMethod(0, static_cast<int>(shapes.size() - 1));
 
-    int idx;
-    idx = secureInputMethod(0, shapes.size() - 1);
+    if (idx == INT_MIN) {
+        cout << "Отмена.\n";
+        system("pause");
+        return;
+    }
 
-    Shape* s = shapes[idx];
-    s->print();
-    cout << " -> S = " << s->area() << '\n';
+    const Shape* s = shapes[idx];
+
+    if (s) {
+        s->print();
+        cout << " -> S = " << s->area() << '\n';
+    } else {
+        cout << "Ошибка: пустой указатель.\n";
+    }
 
     system("pause");
 }
