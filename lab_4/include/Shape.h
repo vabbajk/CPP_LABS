@@ -11,6 +11,6 @@ public:
     virtual ~Shape();
 
     virtual double area() const = 0;
-    virtual void print() const;
+    virtual void print() const = 0;
     const std::string &getName() const;
 };
