@@ -126,7 +126,7 @@ void addByIndex(SafeArray &arr) {
         return;
     }
     try {
-        arr[static_cast<int>(idx)] = value;
+        arr[idx] = value;
         cout << "Установлено arr[" << idx << "] = " << value << endl;
     } catch (const out_of_range &e) {
         cerr << "Исключение: " << e.what() << endl;
@@ -160,7 +160,7 @@ void readByIndex(const SafeArray &arr) {
         return;
     }
     try {
-        cout << "arr[" << idx << "] = " << arr[static_cast<int>(idx)] << endl;
+        cout << "arr[" << idx << "] = " << arr[idx] << endl;
     } catch (const out_of_range &e) {
         cerr << "Исключение: " << e.what() << endl;
     }
@@ -173,7 +173,7 @@ void recreateArray(SafeArray &arr) {
         cout << "Отмена." << endl;
         return;
     }
-    SafeArray tmp(static_cast<int>(newSize));
+    SafeArray tmp(newSize);
     arr = tmp;
     cout << "Массив пересоздан. Новый размер: " << arr.size() << endl;
 }

@@ -3,7 +3,7 @@
 #include <format>
 using namespace std;
 
- SafeArray::SafeArray() : arrSize(0), data(nullptr){}
+ SafeArray::SafeArray() : data(nullptr), arrSize(0){}
 
 SafeArray::SafeArray(int size) : arrSize(size) {
     if (size == 0) {

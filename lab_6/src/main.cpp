@@ -11,7 +11,7 @@ int main() {
     int initSize = secureInputMethod(0, INT_MAX);
     if (initSize == INT_MIN) {exit(0);}
 
-    SafeArray arr(static_cast<int>(initSize));
+    SafeArray arr(initSize);
 
     while (true) {
         printMenu();
