@@ -121,7 +121,7 @@ void printQueueMenu() {
     cout << "Ваш выбор: ";
 }
 
-void handleIntQueue(Queue<int>& q) {
+void handleIntQueue(Queue<int> &q) {
     bool subRun = true;
     while (subRun) {
         system("cls");
@@ -137,10 +137,11 @@ void handleIntQueue(Queue<int>& q) {
 
             case '1': {
                 cout << "Введите число для добавления: ";
-                if (int val = secureInputMethod(INT_MIN+1, INT_MAX); val != INT_MIN) {
+                if (int val = secureInputMethod(INT_MIN + 1, INT_MAX); val != INT_MIN) {
                     q.enqueue(val);
                     cout << "Добавлено!\n";
-                } else cout << "Отмена ввода.\n";
+                } else
+                    cout << "Отмена ввода.\n";
                 system("pause");
                 break;
             }
@@ -165,7 +166,7 @@ void handleIntQueue(Queue<int>& q) {
     }
 }
 
-void handleStringQueue(Queue<string>& q) {
+void handleStringQueue(Queue<string> &q) {
     bool subRun = true;
     while (subRun) {
         system("cls");
@@ -209,7 +210,7 @@ void handleStringQueue(Queue<string>& q) {
     }
 }
 
-void handleDoubleQueue(Queue<double>& q) {
+void handleDoubleQueue(Queue<double> &q) {
     bool subRun = true;
     while (subRun) {
         system("cls");
@@ -231,11 +232,9 @@ void handleDoubleQueue(Queue<double>& q) {
                     double val = stod(s);
                     q.enqueue(val);
                     cout << "Добавлено!\n";
-                }
-                catch (const invalid_argument&) {
+                } catch (const invalid_argument &) {
                     cout << "Ошибка: некорректное число.\n";
-                }
-                catch (const out_of_range&) {
+                } catch (const out_of_range &) {
                     cout << "Ошибка: число вне диапазона double.\n";
                 }
                 system("pause");

@@ -17,10 +17,10 @@ void printMainMenu();
 
 void printQueueMenu();
 
-void handleIntQueue(Queue<int>& q);
+void handleIntQueue(Queue<int> &q);
 
-void handleStringQueue(Queue<string>& q);
+void handleStringQueue(Queue<string> &q);
 
-void handleDoubleQueue(Queue<double>& q);
+void handleDoubleQueue(Queue<double> &q);
 
 #endif

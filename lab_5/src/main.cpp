@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
-#include "../include/Queue.h"
 #include "../include/Header.h"
+#include "../include/Queue.h"
 
 using namespace std;
 

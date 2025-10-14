@@ -9,7 +9,9 @@ int main() {
     cout << "¬ведите размер массива (ESC Ч 0): ";
 
     int initSize = secureInputMethod(0, INT_MAX);
-    if (initSize == INT_MIN) {exit(0);}
+    if (initSize == INT_MIN) {
+        exit(0);
+    }
 
     SafeArray arr(initSize);
 

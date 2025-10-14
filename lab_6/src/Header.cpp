@@ -177,5 +177,3 @@ void recreateArray(SafeArray &arr) {
     arr = tmp;
     cout << "Массив пересоздан. Новый размер: " << arr.size() << endl;
 }
-
-
