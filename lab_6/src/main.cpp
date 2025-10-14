@@ -11,7 +11,7 @@ int main() {
     int initSize = secureInputMethod(0, INT_MAX);
     if (initSize == INT_MIN) {exit(0);}
 
-    SafeArray arr(static_cast<size_t>(initSize));
+    SafeArray arr(static_cast<int>(initSize));
 
     while (true) {
         printMenu();
@@ -39,6 +39,8 @@ int main() {
             case '0':
                 cout << "Выход..." << endl;
                 return 0;
+            default:
+                cout << "Как ты сюда попал :D" << endl;
         }
         system("pause");
         system("cls");

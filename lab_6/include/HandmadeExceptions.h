@@ -8,23 +8,25 @@
 class SafeArray {
 private:
     int* data;
-    size_t arrSize;
+    int arrSize;
 
 public:
 
     explicit SafeArray();
 
-    explicit SafeArray(size_t size);
+    explicit SafeArray(int size);
+
+    SafeArray(const SafeArray& other);
 
     ~SafeArray();
 
     SafeArray& operator=(const SafeArray& other);
 
-    const int& operator[](size_t index) const ;
+    const int& operator[](int index) const ;
 
-    int& operator[](size_t index);
+    int& operator[](int index);
 
-    size_t size() const;
+    int size() const;
 };
 
 #endif

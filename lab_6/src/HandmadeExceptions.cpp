@@ -1,17 +1,26 @@
 #include "../include/HandmadeExceptions.h"
+
+#include <format>
 using namespace std;
 
- SafeArray::SafeArray() : arrSize(0) {
-     data = nullptr;
-}
+ SafeArray::SafeArray() : arrSize(0), data(nullptr){}
 
-SafeArray::SafeArray(size_t size) : arrSize(size) {
+SafeArray::SafeArray(int size) : arrSize(size) {
     if (size == 0) {
         data = nullptr;
     } else {
         data = new int[size]();
     }
 }
+
+SafeArray::SafeArray(const SafeArray& other)
+    : data(nullptr), arrSize(other.arrSize)
+ {
+     if (arrSize > 0) {
+         data = new int[arrSize];
+         std::copy(other.data, other.data + arrSize, data);
+     }
+ }
 
 SafeArray::~SafeArray() {
     delete[] data;
@@ -29,7 +38,7 @@ SafeArray &SafeArray::operator=(const SafeArray& other) {
         data = nullptr;
     } else {
         data = new int[other.arrSize];
-        for (size_t i = 0; i < other.arrSize; ++i) {
+        for (int i = 0; i < other.arrSize; ++i) {
             data[i] = other.data[i];
         }
     }
@@ -37,28 +46,24 @@ SafeArray &SafeArray::operator=(const SafeArray& other) {
     return *this;
 }
 
-const int & SafeArray::operator[](size_t index) const{
-    if (index >= arrSize) {
+const int& SafeArray::operator[](int index) const {
+    if (index >= arrSize || index < 0) {
         throw out_of_range(
-            "Индекс " + to_string(index) +
-            " выходит за пределы массива (размер: " +
-            to_string(arrSize) + ")"
+            format("Индекс {} выходит за пределы массива (размер: {})", index, arrSize)
         );
     }
     return data[index];
 }
 
-int & SafeArray::operator[](size_t index) {
-        if (index >= arrSize || index < 0) {
-            throw out_of_range(
-                "Индекс " + to_string(index) +
-                " выходит за пределы массива (размер: " +
-                to_string(arrSize) + ")"
-            );
-        }
-        return data[index];
+int& SafeArray::operator[](int index) {
+    if (index >= arrSize || index < 0) {
+        throw out_of_range(
+            format("Индекс {} выходит за пределы массива (размер: {})", index, arrSize)
+        );
+    }
+    return data[index];
 }
 
-size_t SafeArray::size() const {
+int SafeArray::size() const {
     return arrSize;
 }
