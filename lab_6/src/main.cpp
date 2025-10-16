@@ -13,7 +13,7 @@ int main() {
         exit(0);
     }
 
-    SafeArray arr(static_cast<size_t>(initSize));
+    SafeArray arr(initSize);
 
     while (true) {
         printMenu();

@@ -7,18 +7,18 @@ using namespace std;
 
 
 void Person::inputFromConsole() {
-    cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ñ„Ð°Ð¼Ð¸Ð»Ð¸ÑŽ: ";
+    cout << "Ââåäèòå ôàìèëèþ: ";
     cin >> surname;
-    cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð¸Ð¼Ñ: ";
+    cout << "Ââåäèòå èìÿ: ";
     cin >> name;
-    cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð¾Ñ‚Ñ‡ÐµÑÑ‚Ð²Ð¾: ";
+    cout << "Ââåäèòå îò÷åñòâî: ";
     cin >> patronymic;
-    cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð½Ð¾Ð¼ÐµÑ€ ÑÐ¾Ñ‚Ñ€ÑƒÐ´Ð½Ð¸ÐºÐ° (Ñ†ÐµÐ»Ð¾Ðµ): ";
+    cout << "Ââåäèòå íîìåð ñîòðóäíèêà (öåëîå): ";
     int id = secureInputMethod(0, INT_MAX);
     while (id == INT_MIN) {
-        cout << "\nÐ’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð½Ð¾Ð¼ÐµÑ€ ÑÐ¾Ñ‚Ñ€ÑƒÐ´Ð½Ð¸ÐºÐ° (Ñ†ÐµÐ»Ð¾Ðµ): ";
+        cout << "\nÂâåäèòå íîìåð ñîòðóäíèêà (öåëîå): ";
         id = secureInputMethod(0, INT_MAX);
     }
-    emp_id = static_cast<unsigned int>(id);
+    emp_id = id;
 }
 
