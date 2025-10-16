@@ -12,19 +12,16 @@ void handleAddRecord(const string &storageFilename) {
     p.inputFromConsole();
     try {
         append_record(storageFilename, p);
-        cout << "Запись добавлена." << endl;
+        std::cout << "Запись добавлена." << std::endl;
     }
-    catch (const ios_base::failure& e) {
-        cerr << "Ошибка ввода/вывода: " << e.what() << endl;
+    catch (const FileOpenException& e) {
+        std::cerr << "Не удалось открыть файл: " << e.what() << std::endl;
     }
-    catch (const invalid_argument& e) {
-        cerr << "Неверный аргумент: " << e.what() << endl;
+    catch (const std::invalid_argument& e) {
+        std::cerr << "Неверные данные: " << e.what() << std::endl;
     }
-    catch (const runtime_error& e) {
-        cerr << "Ошибка выполнения: " << e.what() << endl;
-    }
-    catch (const exception& e) {
-        cerr << "Неизвестная ошибка: " << e.what() << endl;
+    catch (const std::exception& e) {
+        std::cerr << "Неизвестная ошибка: " << e.what() << std::endl;
     }
 }
 

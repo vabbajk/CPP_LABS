@@ -22,9 +22,10 @@ bool print_all(const string& filename, ostream &os) {
     Person p;
     size_t idx = 1;
     while (ifs >> p) {
-        os << idx++ << ") "
+        os << idx << ") "
            << p.surname << ' ' << p.name << ' ' << p.patronymic
            << ", ID: " << p.emp_id << '\n';
+        idx++;
     }
     ifs.close();
     return true;
