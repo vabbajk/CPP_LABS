@@ -1,12 +1,13 @@
 #include "../include/HandmadeExceptions.h"
 
 #include <algorithm>
+#include <format>
 #include <string>
 using namespace std;
 
-SafeArray::SafeArray() : data(nullptr), arrSize(0) {}
+SafeArray::SafeArray() : arrSize(0) {}
 
-SafeArray::SafeArray(int size) : data(nullptr), arrSize(size) {
+SafeArray::SafeArray(int size) : arrSize(size) {
     if (size <= 0) {
         data = nullptr;
         arrSize = 0;
@@ -15,7 +16,7 @@ SafeArray::SafeArray(int size) : data(nullptr), arrSize(size) {
     }
 }
 
-SafeArray::SafeArray(const SafeArray &other) : data(nullptr), arrSize(other.arrSize) {
+SafeArray::SafeArray(const SafeArray &other) : arrSize(other.arrSize) {
     if (arrSize > 0) {
         data = new int[arrSize];
         std::copy(other.data, other.data + arrSize, data);
@@ -43,18 +44,20 @@ SafeArray &SafeArray::operator=(const SafeArray &other) {
     return *this;
 }
 
-const int &SafeArray::operator[](int index) const {
-    if (index < 0 || index >= arrSize) {
-        throw out_of_range("Индекс " + to_string(index) +
-                           " выходит за пределы массива (размер: " + to_string(arrSize) + ")");
+const int& SafeArray::operator[](int index) const {
+    if (index >= arrSize) {
+        throw std::out_of_range(
+            std::format("Индекс {} выходит за пределы массива (размер: {})", index, arrSize)
+        );
     }
     return data[index];
 }
 
-int &SafeArray::operator[](int index) {
-    if (index < 0 || index >= arrSize) {
-        throw out_of_range("Индекс " + to_string(index) +
-                           " выходит за пределы массива (размер: " + to_string(arrSize) + ")");
+int& SafeArray::operator[](int index) {
+    if (index >= arrSize) {
+        throw std::out_of_range(
+            std::format("Индекс {} выходит за пределы массива (размер: {})", index, arrSize)
+        );
     }
     return data[index];
 }

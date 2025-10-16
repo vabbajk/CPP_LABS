@@ -7,7 +7,7 @@ using namespace std;
 void append_record(const string& filename, const Person& p) {
     ofstream ofs(filename, ios::app);
     if (!ofs) {
-        throw runtime_error("Ошибочка рантайма, с этим файликом чет не так : " + filename);
+        throw FileOpenException(filename);
     }
     ofs << p;
     ofs.close();

@@ -7,7 +7,7 @@
 
 class SafeArray {
 private:
-    int *data;
+    int *data = nullptr;
     int arrSize;
 
 public:

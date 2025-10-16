@@ -14,9 +14,15 @@ struct Person {
 
     void inputFromConsole();
 
-    friend std::ostream &operator<<(std::ostream &os, const Person &p);
+    friend std::ostream& operator<<(std::ostream& os, const Person& p) {
+        os << p.surname << ' ' << p.name << ' ' << p.patronymic << ' ' << p.emp_id;
+        return os;
+    }
 
-    friend std::istream &operator>>(std::istream &is, Person &p);
+    friend std::istream& operator>>(std::istream& is, Person& p) {
+        is >> p.surname >> p.name >> p.patronymic >> p.emp_id;
+        return is;
+    }
 };
 
 

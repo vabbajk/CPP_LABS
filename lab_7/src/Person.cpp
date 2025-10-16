@@ -22,16 +22,3 @@ void Person::inputFromConsole() {
     emp_id = static_cast<unsigned int>(id);
 }
 
-
-ostream &operator<<(ostream &os, const Person &p) {
-
-    os << p.surname << ' ' << p.name << ' ' << p.patronymic << ' ' << p.emp_id << '\n';
-    return os;
-}
-
-
-istream &operator>>(istream &is, Person &p) {
-
-    is >> p.surname >> p.name >> p.patronymic >> p.emp_id;
-    return is;
-}

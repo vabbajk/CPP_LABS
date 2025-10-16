@@ -14,6 +14,4 @@ char chooseTaskNtoM(char n, char m);
 
 void printMenu();
 
-void setupRussianConsole();
-
 #endif

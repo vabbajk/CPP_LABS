@@ -7,7 +7,7 @@ using namespace std;
 
 int main() {
 
-    setupRussianConsole();
+    system("chcp 1251");
     system("cls");
 
     const string storage = "employees.txt";
@@ -33,10 +33,10 @@ int main() {
                 break;
             }
             case '0':
-                cout << "Ð’Ñ‹Ñ…Ð¾Ð´.\n";
+                cout << "Âûõîä.\n";
                 return 0;
             default:
-                cout << "ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ Ð²Ñ‹Ð±Ð¾Ñ€\n";
+                cout << "Íåêîððåêòíûé âûáîð\n";
         }
         system("pause");
         system("cls");

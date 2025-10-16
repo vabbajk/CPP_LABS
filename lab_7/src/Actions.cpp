@@ -12,25 +12,35 @@ void handleAddRecord(const string &storageFilename) {
     p.inputFromConsole();
     try {
         append_record(storageFilename, p);
-        cout << "Ð—Ð°Ð¿Ð¸ÑÑŒ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð°." << endl;
-    } catch (const exception &e) {
-        cerr << "ÐžÑˆÐ¸Ð±ÐºÐ°: " << e.what() << endl;
+        cout << "Çàïèñü äîáàâëåíà." << endl;
+    }
+    catch (const ios_base::failure& e) {
+        cerr << "Îøèáêà ââîäà/âûâîäà: " << e.what() << endl;
+    }
+    catch (const invalid_argument& e) {
+        cerr << "Íåâåðíûé àðãóìåíò: " << e.what() << endl;
+    }
+    catch (const runtime_error& e) {
+        cerr << "Îøèáêà âûïîëíåíèÿ: " << e.what() << endl;
+    }
+    catch (const exception& e) {
+        cerr << "Íåèçâåñòíàÿ îøèáêà: " << e.what() << endl;
     }
 }
 
 void handleShowAll(const string &storageFilename) {
-    cout << "Ð¡Ð¿Ð¸ÑÐ¾Ðº Ð·Ð°Ð¿Ð¸ÑÐµÐ¹:" << endl;
+    cout << "Ñïèñîê çàïèñåé:" << endl;
     bool ok = print_all(storageFilename, cout);
     if (!ok) {
-        cout << "Ð¤Ð°Ð¹Ð» Ð¿Ð¾ÐºÐ° Ð½Ðµ ÑÐ¾Ð´ÐµÑ€Ð¶Ð¸Ñ‚ Ð·Ð°Ð¿Ð¸ÑÐµÐ¹ Ð¸Ð»Ð¸ Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚." << endl;
+        cout << "Ôàéë ïîêà íå ñîäåðæèò çàïèñåé èëè îòñóòñòâóåò." << endl;
     }
 }
 
 void handleRemoveFile(const string &storageFilename) {
     if (remove_file(storageFilename)) {
-        cout << "Ð¤Ð°Ð¹Ð» ÑƒÐ´Ð°Ð»Ñ‘Ð½." << endl;
+        cout << "Ôàéë óäàë¸í." << endl;
     } else {
-        cout << "ÐÐµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ ÑƒÐ´Ð°Ð»Ð¸Ñ‚ÑŒ Ñ„Ð°Ð¹Ð» (Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾, ÐµÐ³Ð¾ Ð½ÐµÑ‚)." << endl;
+        cout << "Íå óäàëîñü óäàëèòü ôàéë (âîçìîæíî, åãî íåò)." << endl;
     }
 }
 
