@@ -126,7 +126,7 @@ void addByIndex(SafeArray &arr) {
         return;
     }
     try {
-        arr[idx] = value;
+        arr[static_cast<size_t>(idx)] = value;
         cout << "Установлено arr[" << idx << "] = " << value << endl;
     } catch (const out_of_range &e) {
         cerr << "Исключение: " << e.what() << endl;
@@ -139,7 +139,7 @@ void printArray(const SafeArray &arr) {
         return;
     }
     cout << "Содержимое массива (размер: " << arr.size() << "):" << endl;
-    for (int i = 0; i < arr.size(); ++i) {
+    for (size_t i = 0; i < arr.size(); ++i) {
         try {
             cout << "[" << i << "] = " << arr[i] << '\n';
         } catch (const out_of_range &e) {
@@ -160,7 +160,7 @@ void readByIndex(const SafeArray &arr) {
         return;
     }
     try {
-        cout << "arr[" << idx << "] = " << arr[idx] << endl;
+        cout << "arr[" << idx << "] = " << arr[static_cast<size_t>(idx)] << endl;
     } catch (const out_of_range &e) {
         cerr << "Исключение: " << e.what() << endl;
     }
@@ -173,7 +173,7 @@ void recreateArray(SafeArray &arr) {
         cout << "Отмена." << endl;
         return;
     }
-    SafeArray tmp(newSize);
+    SafeArray tmp(static_cast<size_t>(newSize));
     arr = tmp;
     cout << "Массив пересоздан. Новый размер: " << arr.size() << endl;
 }
