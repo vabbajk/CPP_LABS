@@ -45,6 +45,11 @@ SafeArray &SafeArray::operator=(const SafeArray &other) {
 }
 
 const int& SafeArray::operator[](int index) const {
+    if (index < 0) {
+        throw std::out_of_range(
+            std::format("Индекс {} выходит за нижнюю границу массива ({} < 0)", index, index)
+            );
+    }
     if (index >= arrSize) {
         throw std::out_of_range(
             std::format("Индекс {} выходит за пределы массива (размер: {})", index, arrSize)
@@ -54,6 +59,11 @@ const int& SafeArray::operator[](int index) const {
 }
 
 int& SafeArray::operator[](int index) {
+    if (index < 0) {
+        throw std::out_of_range(
+            std::format("Индекс {} выходит за нижнюю границу массива ({} < 0)", index, index)
+            );
+    }
     if (index >= arrSize) {
         throw std::out_of_range(
             std::format("Индекс {} выходит за пределы массива (размер: {})", index, arrSize)
