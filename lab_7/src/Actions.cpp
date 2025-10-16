@@ -20,7 +20,7 @@ void handleAddRecord(const string &storageFilename) {
     catch (const std::invalid_argument& e) {
         std::cerr << "Неверные данные: " << e.what() << std::endl;
     }
-    catch (const std::exception& e) {
+    catch (const std::system_error& e) {
         std::cerr << "Неизвестная ошибка: " << e.what() << std::endl;
     }
 }
