@@ -39,7 +39,7 @@ void handleShowQueue(Queue<int>& q) {
 
     cout << "Элементы очереди: ";
 
-    for (auto& value : q){ cout << value << " "; }
+    for (int& value : q){ cout << value << " "; }
 
     cout << "\n";
 }
@@ -53,7 +53,7 @@ void handleSortQueue(Queue<int>& q) {
     cout << "Выберите тип сортировки:\n"
             "1. По возрастанию\n"
             "2. По убыванию\n> ";
-    
+
     char type;
     cin >> type;
 

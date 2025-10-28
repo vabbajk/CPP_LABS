@@ -18,9 +18,9 @@ private:
     size_t count = 0;
 
 public:
-    Queue(){}
+    Queue() = default;
 
-    Queue(const Queue& other) : front(nullptr), rear(nullptr), count(0) {
+    Queue(const Queue& other) {
         for (Node<T>* cur = other.front; cur; cur = cur->next)
             push(cur->data);
     }
