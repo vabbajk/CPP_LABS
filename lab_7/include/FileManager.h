@@ -1,11 +1,11 @@
 #ifndef FILE_MANAGER_H
 #define FILE_MANAGER_H
 
-
+#include <fstream>
+#include <iostream>
 #include <string>
 #include <ostream>
 #include "Person.h"
-
 
 void append_record(const std::string &filename, const Person &p);
 

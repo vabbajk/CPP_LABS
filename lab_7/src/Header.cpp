@@ -1,8 +1,5 @@
 #include "../include/Header.h"
 
-#include <iostream>
-#include <limits>
-
 using namespace std;
 
 bool checkIntToValid(const string &input, int min, int max, long long &out) {
@@ -102,7 +99,7 @@ char chooseTaskNtoM(char n, char m) {
 }
 
 void printMenu() {
-    cout << "Лабораторная работа №7 - демонстрация" << endl;
+    cout << "Лабораторная работа №7 - демонстрация потоков ввода/вывода" << endl;
     cout << "Меню:" << endl;
     cout << "1) Добавить запись о сотруднике" << endl;
     cout << "2) Показать все записи" << endl;

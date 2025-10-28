@@ -1,9 +1,4 @@
 #include "../include/Actions.h"
-#include <algorithm>
-#include <iostream>
-#include <string>
-#include "../include/FileManager.h"
-#include "../include/Person.h"
 
 using namespace std;
 

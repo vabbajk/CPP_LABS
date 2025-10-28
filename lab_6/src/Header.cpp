@@ -128,7 +128,7 @@ void addByIndex(SafeArray &arr) {
     try {
         arr[idx] = value;
         cout << "Установлено arr[" << idx << "] = " << value << endl;
-    } catch (const out_of_range &e) {
+    } catch (const OutOfRangeError &e) {
         cerr << "Исключение: " << e.what() << endl;
     }
 }
@@ -142,7 +142,7 @@ void printArray(const SafeArray &arr) {
     for (size_t i = 0; i < arr.size(); ++i) {
         try {
             cout << "[" << i << "] = " << arr[i] << '\n';
-        } catch (const out_of_range &e) {
+        } catch (const OutOfRangeError &e) {
             cerr << "Исключение при доступе к индексу " << i << ": " << e.what() << endl;
         }
     }
@@ -161,7 +161,7 @@ void readByIndex(const SafeArray &arr) {
     }
     try {
         cout << "arr[" << idx << "] = " << arr[idx] << endl;
-    } catch (const out_of_range &e) {
+    } catch (const OutOfRangeError &e) {
         cerr << "Исключение: " << e.what() << endl;
     }
 }

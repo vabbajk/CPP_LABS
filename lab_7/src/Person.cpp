@@ -1,7 +1,5 @@
 #include "../include/Person.h"
-#include <iostream>
-#include <limits>
-#include "../include/Header.h"
+
 
 using namespace std;
 
