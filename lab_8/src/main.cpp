@@ -19,19 +19,19 @@ int main() {
         switch (opt) {
             case '1':
                 handleAddElement(queue);
-            break;
+                break;
             case '2':
                 handleShowQueue(queue);
-            break;
+                break;
             case '3':
                 handleSortQueue(queue);
-            break;
+                break;
             case '4':
                 handleFindElement(queue);
-            break;
+                break;
             case '0':
                 cout << "Выход.\n";
-            return 0;
+                return 0;
             default:
                 cout << "Некорректный выбор\n";
         }
@@ -40,5 +40,4 @@ int main() {
         system("cls");
     }
 
-    return 0;
 }

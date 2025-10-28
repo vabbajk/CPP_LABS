@@ -6,25 +6,65 @@
 template <typename T>
 struct Node {
     T data;
-    Node* next;
-    explicit Node(const T& value) : data(value), next(nullptr) {}
+    Node* next = nullptr;
+    explicit Node(const T& value) : data(value) {}
 };
 
 template <typename T>
 class Queue {
 private:
-    Node<T>* front;
-    Node<T>* rear;
-    size_t count;
+    Node<T>* front = nullptr;
+    Node<T>* rear = nullptr;
+    size_t count = 0;
 
 public:
-    Queue() : front(nullptr), rear(nullptr), count(0) {}
-    ~Queue() {
-        while (!empty()) pop();
+    Queue(){}
+
+    Queue(const Queue& other) : front(nullptr), rear(nullptr), count(0) {
+        for (Node<T>* cur = other.front; cur; cur = cur->next)
+            push(cur->data);
+    }
+
+    ~Queue() noexcept {
+        Node<T>* current = front;
+        while (current) {
+            Node<T>* next = current->next;
+            delete current;
+            current = next;
+        }
+        front = rear = nullptr;
+        count = 0;
+    }
+
+    Queue& operator=(const Queue& other) {
+        if (this != &other) {
+            clear();
+            for (Node<T>* cur = other.front; cur; cur = cur->next)
+                push(cur->data);
+        }
+        return *this;
+    }
+
+    Queue(Queue&& other) noexcept
+    : front(other.front), rear(other.rear), count(other.count) {
+        other.front = other.rear = nullptr;
+        other.count = 0;
+    }
+
+    Queue& operator=(Queue&& other) noexcept {
+        if (this != &other) {
+            clear();
+            front = other.front;
+            rear = other.rear;
+            count = other.count;
+            other.front = other.rear = nullptr;
+            other.count = 0;
+        }
+        return *this;
     }
 
     void push(const T& value) {
-        Node<T>* node = new Node<T>(value);
+        auto node = new Node<T>(value);
         if (rear) rear->next = node;
         else front = node;
         rear = node;
@@ -54,4 +94,15 @@ public:
 
     template <typename> friend class QueueAlgorithms;
     template <typename> friend class QueueIterator;
+
+    void clear() noexcept {
+        Node<T>* current = front;
+        while (current) {
+            Node<T>* next = current->next;
+            delete current;
+            current = next;
+        }
+        front = rear = nullptr;
+        count = 0;
+    }
 };
