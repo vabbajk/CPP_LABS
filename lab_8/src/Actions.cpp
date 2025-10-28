@@ -39,7 +39,7 @@ void handleShowQueue(Queue<int>& q) {
 
     cout << "Ёлементы очереди: ";
 
-    for (int& value : q){ cout << value << " "; }
+    for (const auto& value : q){ cout << value << " "; }
 
     cout << "\n";
 }
