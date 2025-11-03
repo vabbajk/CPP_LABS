@@ -13,13 +13,15 @@ public:
         return nullptr;
     }
 
-    static void sort(Queue<T>& queue, std::function<bool(const T&, const T&)> comp = std::less<T>()) {
+    template <typename Compare = std::less<T>>
+static void sort(Queue<T>& queue, Compare comp = Compare()) {
         if (queue.size() < 2) return;
+
         bool swapped;
         do {
             swapped = false;
             for (Node<T>* i = queue.front; i && i->next; i = i->next) {
-                if (!comp(i->data, i->next->data)) {
+                if (comp(i->next->data, i->data)) {
                     std::swap(i->data, i->next->data);
                     swapped = true;
                 }

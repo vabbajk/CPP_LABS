@@ -1,5 +1,3 @@
-#include <iostream>
-#include <conio.h>
 #include "../include/Actions.h"
 using namespace std;
 
@@ -23,60 +21,5 @@ char chooseTaskNtoM(char n, char m) {
     return c;
 }
 
-void handleAddElement(Queue<int>& q) {
-    int val;
-    cout << "¬ведите число: ";
-    cin >> val;
-    q.push(val);
-    cout << "Ёлемент добавлен.\n";
-}
 
-void handleShowQueue(Queue<int>& q) {
-    if (q.empty()) {
-        cout << "ќчередь пуста.\n";
-        return;
-    }
 
-    cout << "Ёлементы очереди: ";
-
-    for (const auto& value : q){ cout << value << " "; }
-
-    cout << "\n";
-}
-
-void handleSortQueue(Queue<int>& q) {
-    if (q.empty()) {
-        cout << "ќчередь пуста.\n";
-        return;
-    }
-
-    cout << "¬ыберите тип сортировки:\n"
-            "1. ѕо возрастанию\n"
-            "2. ѕо убыванию\n> ";
-
-    char type;
-    cin >> type;
-
-    if (type == '1')
-        QueueAlgorithms<int>::sort(q, [](int a, int b){ return a < b; });
-    else
-        QueueAlgorithms<int>::sort(q, [](int a, int b){ return a > b; });
-
-    cout << "ќчередь отсортирована.\n";
-}
-
-void handleFindElement(Queue<int>& q) {
-    if (q.empty()) {
-        cout << "ќчередь пуста.\n";
-        return;
-    }
-    int val;
-    cout << "¬ведите значение дл€ поиска: ";
-    cin >> val;
-
-    auto node = QueueAlgorithms<int>::find(q, val);
-    if (node)
-        cout << "Ёлемент " << val << " найден.\n";
-    else
-        cout << "Ёлемент " << val << " не найден.\n";
-}

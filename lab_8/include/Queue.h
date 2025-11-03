@@ -18,6 +18,9 @@ private:
     size_t count = 0;
 
 public:
+
+    using value_type = T;
+
     Queue() = default;
 
     Queue(const Queue& other) {
@@ -91,6 +94,9 @@ public:
 
     QueueIterator<T> begin() { return QueueIterator<T>(front); }
     QueueIterator<T> end() { return QueueIterator<T>(nullptr); }
+
+    QueueIterator<T> begin() const { return QueueIterator<T>(front); }
+    QueueIterator<T> end() const { return QueueIterator<T>(nullptr); }
 
     template <typename> friend class QueueAlgorithms;
     template <typename> friend class QueueIterator;

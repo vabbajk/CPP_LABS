@@ -24,10 +24,10 @@ int main() {
                 handleShowQueue(queue);
                 break;
             case '3':
-                handleSortQueue(queue);
+                handleSortQueue(queue, [](const auto& a, const auto& b){ return a < b; });
                 break;
             case '4':
-                handleFindElement(queue);
+                handleFindMenu(queue);
                 break;
             case '0':
                 cout << "Выход.\n";
