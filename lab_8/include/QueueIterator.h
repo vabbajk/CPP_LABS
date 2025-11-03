@@ -41,8 +41,6 @@ public:
 
     bool operator==(const QueueIterator& other) const = default;
 
-    bool operator!=(const QueueIterator& other) const = default;
-
     friend class Queue<T>;
     friend class QueueAlgorithms<T>;
 };
