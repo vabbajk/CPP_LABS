@@ -39,13 +39,9 @@ public:
         return tmp;
     }
 
-    bool operator==(const QueueIterator& other) const {
-        return current == other.current;
-    }
+    bool operator==(const QueueIterator& other) const = default;
 
-    bool operator!=(const QueueIterator& other) const {
-        return !(*this == other);
-    }
+    bool operator!=(const QueueIterator& other) const = default;
 
     friend class Queue<T>;
     friend class QueueAlgorithms<T>;

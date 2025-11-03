@@ -6,42 +6,40 @@
 #include "QueueAlgorithms.h"
 
 
-using namespace std;
-
 void printMenu();
 char chooseTaskNtoM(char n, char m);
 
 template <typename Container>
 void handleAddElement(Container& q) {
     typename Container::value_type val;
-    cout << "¬ведите элемент: ";
-    cin >> val;
+    std::cout << "¬ведите элемент: ";
+    std::cin >> val;
     q.push(val);
-    cout << "Ёлемент добавлен.\n";
+    std::cout << "Ёлемент добавлен.\n";
 }
 
 template <typename Container>
 void handleShowQueue(const Container& q) {
     if (q.empty()) {
-        cout << "ќчередь пуста.\n";
+        std::cout << "ќчередь пуста.\n";
         return;
     }
 
-    cout << "Ёлементы очереди: ";
+    std::cout << "Ёлементы очереди: ";
     for (const auto& value : q)
-        cout << value << " ";
-    cout << "\n";
+        std::cout << value << " ";
+    std::cout << "\n";
 }
 
 template <typename Container, typename SortFunc>
 void handleSortQueue(Container& q, SortFunc sorter) {
     if (q.empty()) {
-        cout << "ќчередь пуста.\n";
+        std::cout << "ќчередь пуста.\n";
         return;
     }
 
     QueueAlgorithms<typename Container::value_type>::sort(q, sorter);
-    cout << "ќчередь отсортирована.\n";
+    std::cout << "ќчередь отсортирована.\n";
 }
 
 template <typename Container, typename Value, typename Compare>
@@ -68,20 +66,20 @@ void handleFindElement(const Container& q, const Value& value, Compare equal) {
 template <typename Container>
 void handleFindMenu(const Container& q) {
     if (q.empty()) {
-        cout << "ќчередь пуста.\n";
+        std::cout << "ќчередь пуста.\n";
         return;
     }
 
     typename Container::value_type val;
-    cout << "¬ведите значение дл€ поиска: ";
-    cin >> val;
+    std::cout << "¬ведите значение дл€ поиска: ";
+    std::cin >> val;
 
     handleFindElement(q, val, [](const auto& a, const auto& b){ return a == b; });
 }
 
 template <typename Container>
 void handleFindCase(const Container& q){
-    cout << "=== ѕоиск элемента ===\n";
+    std::cout << "=== ѕоиск элемента ===\n";
     handleFindMenu(q);
-    cout << "======================\n";
+    std::cout << "======================\n";
 }
