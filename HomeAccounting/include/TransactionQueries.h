@@ -3,6 +3,7 @@
 #include <list>
 #include <memory>
 #include <ctime>
+#include <chrono>
 
 #include "Transaction.h"
 #include "AnalyticsUtils.h"
@@ -10,9 +11,16 @@
 class TransactionQueries {
 public:
     static double currentMonthExpenses(const std::list<std::shared_ptr<Transaction>>& transactions) {
-        std::time_t now = std::time(nullptr);
+        using std::chrono::system_clock;
+        auto now = system_clock::now();
+        std::time_t timeNow = system_clock::to_time_t(now);
         std::tm timeinfo{};
-        localtime_s(&timeinfo, &now);
+
+#ifdef _WIN32
+        localtime_s(&timeinfo, &timeNow);
+#else
+        localtime_r(&timeNow, &timeinfo);
+#endif
 
         int currentYear = timeinfo.tm_year + 1900;
         int currentMonth = timeinfo.tm_mon + 1;
@@ -35,9 +43,16 @@ public:
     }
 
     static double currentMonthIncome(const std::list<std::shared_ptr<Transaction>>& transactions) {
-        std::time_t now = std::time(nullptr);
+        using std::chrono::system_clock;
+        auto now = system_clock::now();
+        std::time_t timeNow = system_clock::to_time_t(now);
         std::tm timeinfo{};
-        localtime_s(&timeinfo, &now);
+
+#ifdef _WIN32
+        localtime_s(&timeinfo, &timeNow);
+#else
+        localtime_r(&timeNow, &timeinfo);
+#endif
 
         int currentYear = timeinfo.tm_year + 1900;
         int currentMonth = timeinfo.tm_mon + 1;

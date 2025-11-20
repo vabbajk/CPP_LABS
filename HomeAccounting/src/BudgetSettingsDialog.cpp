@@ -18,9 +18,9 @@ BudgetSettingsDialog::BudgetSettingsDialog(BudgetSettings* settings, QWidget* pa
 }
 
 void BudgetSettingsDialog::setupUI() {
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    auto* mainLayout = new QVBoxLayout(this);
     
-    QFormLayout* formLayout = new QFormLayout();
+    auto* formLayout = new QFormLayout();
     
 
     salarySpinBox = new QDoubleSpinBox(this);
@@ -58,7 +58,7 @@ void BudgetSettingsDialog::setupUI() {
     mainLayout->addStretch();
     
 
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    auto* buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();
     
     okButton = new QPushButton(QString::fromUtf8("ОК"), this);

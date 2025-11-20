@@ -134,7 +134,7 @@ void MainWindow::rebuildTransactionTable(const std::vector<std::shared_ptr<Trans
         }
         
 
-        QTableWidgetItem* typeItem = new QTableWidgetItem(type);
+        auto* typeItem = new QTableWidgetItem(type);
         typeItem->setTextAlignment(Qt::AlignCenter);
         transactionTable->setItem(row, 6, typeItem);
         
@@ -210,9 +210,9 @@ void MainWindow::rebuildTransactionTable(const std::vector<std::shared_ptr<Trans
 }
 
 void MainWindow::handleEditButtonClick() {
-    auto* button = qobject_cast<QPushButton*>(sender());
+    const auto* button = qobject_cast<const QPushButton*>(sender());
     if (!button) return;
-    size_t id = static_cast<size_t>(button->property("transactionId").toULongLong());
+    auto id = button->property("transactionId").toULongLong();
     editTransactionById(id);
 }
 
@@ -260,7 +260,7 @@ void MainWindow::setupUI() {
     mainLayout->addLayout(topLayout);
     
 
-    QHBoxLayout* warningLayout = new QHBoxLayout();
+    auto* warningLayout = new QHBoxLayout();
     warningLayout->addWidget(budgetWarningLabel);
     mainLayout->addLayout(warningLayout);
     
@@ -404,19 +404,19 @@ void MainWindow::createMenuBar() {
     
     auto* fileMenu = menuBar->addMenu(QString::fromUtf8("Файл"));
     fileMenu->addSeparator();
-    auto* exitAction = fileMenu->addAction(QString::fromUtf8("Выход"));
+    const auto* exitAction = fileMenu->addAction(QString::fromUtf8("Выход"));
     
     connect(exitAction, &QAction::triggered, this, &QMainWindow::close);
     
     auto* helpMenu = menuBar->addMenu(QString::fromUtf8("Справка"));
-    auto* aboutAction = helpMenu->addAction(QString::fromUtf8("О программе"));
+    const auto* aboutAction = helpMenu->addAction(QString::fromUtf8("О программе"));
     connect(aboutAction, &QAction::triggered, this, &MainWindow::onAbout);
 
     auto* settingsMenu = menuBar->addMenu(QString::fromUtf8("Настройки"));
-    auto* budgetSettingsAction = settingsMenu->addAction(QString::fromUtf8("Настройка бюджета..."));
+    const auto* budgetSettingsAction = settingsMenu->addAction(QString::fromUtf8("Настройка бюджета..."));
     connect(budgetSettingsAction, &QAction::triggered, this, &MainWindow::onBudgetSettings);
     settingsMenu->addSeparator();
-    auto* exportTxtAction = settingsMenu->addAction(QString::fromUtf8("Выгрузить все транзакции в TXT..."));
+    const auto* exportTxtAction = settingsMenu->addAction(QString::fromUtf8("Выгрузить все транзакции в TXT..."));
     connect(exportTxtAction, &QAction::triggered, this, &MainWindow::onExportTxt);
 }
 
@@ -445,7 +445,7 @@ void MainWindow::connectSignals() {
     transactionTable->setColumnWidth(0, 30);
 }
 
-void MainWindow::applyTheme(bool dark) {
+void MainWindow::applyTheme(bool dark) const {
 
     QApplication::setStyle("Fusion");
     QFont font("Segoe UI", 10);
@@ -926,7 +926,7 @@ void MainWindow::updateTable() {
 
 
         connect(editRowButton, &QPushButton::clicked, this, [this, editRowButton]() {
-            size_t id = static_cast<size_t>(editRowButton->property("transactionId").toULongLong());
+            auto id = editRowButton->property("transactionId").toULongLong();
             editTransactionById(id);
         });
 
@@ -1008,14 +1008,14 @@ void MainWindow::onEditTransaction() {
         return;
     }
     
-    auto* idItem = transactionTable->item(currentRow, 1);
+    const auto* idItem = transactionTable->item(currentRow, 1);
     if (!idItem) return;
     size_t id = idItem->text().toULongLong();
     editTransactionById(id);
 }
 
 void MainWindow::onTableDoubleClicked(int row, int column) {
-    Q_UNUSED(column);
+    (void)column;
     transactionTable->selectRow(row);
     onEditTransaction();
 }
@@ -1092,11 +1092,12 @@ void MainWindow::onClearFilter() {
 }
 
 void MainWindow::deleteTransactionById(size_t id) {
-    QMessageBox::StandardButton reply = QMessageBox::question(this,
+    if (const auto reply = QMessageBox::question(this,
         QString::fromUtf8("Подтверждение"),
         QString::fromUtf8("Вы уверены, что хотите удалить эту транзакцию?"),
-        QMessageBox::Yes | QMessageBox::No);
-    if (reply != QMessageBox::Yes) return;
+        QMessageBox::Yes | QMessageBox::No); reply != QMessageBox::Yes) {
+        return;
+    }
     transactionList.deleteTransaction(id);
     transactionList.saveToDatabase();
     applyFiltersAndUpdateTable();
@@ -1108,7 +1109,7 @@ void MainWindow::deleteTransactionById(size_t id) {
 void MainWindow::deleteSelectedRow() {
     int row = transactionTable->currentRow();
     if (row < 0) return;
-    auto* idItem = transactionTable->item(row, 1);
+    const auto* idItem = transactionTable->item(row, 1);
     if (!idItem) return;
     size_t id = idItem->text().toULongLong();
     deleteTransactionById(id);
@@ -1142,13 +1143,13 @@ void MainWindow::editTransactionById(size_t id) {
 void MainWindow::onTableContextMenu(const QPoint& pos) {
     QModelIndex index = transactionTable->indexAt(pos);
     QMenu menu(this);
-    auto* editAct = menu.addAction(QString::fromUtf8("Редактировать"));
-    auto* delAct = menu.addAction(QString::fromUtf8("Удалить"));
-    auto* chosen = menu.exec(transactionTable->viewport()->mapToGlobal(pos));
+    const auto* editAct = menu.addAction(QString::fromUtf8("Редактировать"));
+    const auto* delAct = menu.addAction(QString::fromUtf8("Удалить"));
+    const auto* chosen = menu.exec(transactionTable->viewport()->mapToGlobal(pos));
     if (!chosen) return;
     int row = index.isValid() ? index.row() : transactionTable->currentRow();
     if (row < 0) return;
-    QTableWidgetItem* idItem = transactionTable->item(row, 1);
+    const auto* idItem = transactionTable->item(row, 1);
     if (!idItem) return;
     size_t id = idItem->text().toULongLong();
     if (chosen == editAct) {
@@ -1306,7 +1307,7 @@ void MainWindow::updateSavingsRadar() {
     
     double cappedSavings = std::clamp(effectiveSavings, 0.0, plannedSavings);
     double progress = (plannedSavings > 0.0) ? (cappedSavings / plannedSavings) * 100.0 : 0.0;
-    int progressValue = static_cast<int>(std::round(std::clamp(progress, 0.0, 200.0)));
+    const auto progressValue = static_cast<int>(std::round(std::clamp(progress, 0.0, 200.0)));
     savingsProgressBar->setValue(std::min(progressValue, 100));
 
     QString color = "#4caf50";

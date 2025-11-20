@@ -26,7 +26,6 @@ public:
         return os << std::format("{:02}.{:02}.{}", date.day, date.month, date.year);
     }
 
-    friend bool operator==(const Date& lhs, const Date& rhs) = default;
     friend auto operator<=>(const Date& lhs, const Date& rhs) = default;
 };
 

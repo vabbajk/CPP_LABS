@@ -60,7 +60,7 @@ private:
     void deleteTransactionById(size_t id);
     void deleteSelectedRow();
     void editTransactionById(size_t id);
-    void applyTheme(bool dark);
+    void applyTheme(bool dark) const;
     void checkBudgetLimit();
     void updateBudgetInfo();
     void updateBudgetWarning();
