@@ -3,6 +3,8 @@
 #include "../include/EditTransactionDialog.h"
 #include "../include/BudgetSettings.h"
 #include "../include/BudgetSettingsDialog.h"
+#include "../include/TransactionFilter.h"
+#include "../include/FiltersPanel.h"
 #include <QApplication>
 #include <QMenuBar>
 #include <QMenu>
@@ -47,94 +49,16 @@ MainWindow::MainWindow(QWidget *parent)
     applyTheme(true);
 }
 
-void MainWindow::buildCategoryModel() {
-    categoryModel->clear();
-    categoryModel->setHorizontalHeaderLabels({QString::fromUtf8("Категория")});
-
-    auto makeParent = [&](const QString& title) {
-        auto* parent = new QStandardItem(title);
-        parent->setFlags(Qt::ItemIsEnabled);
-        return parent;
-    };
-
-    QStandardItem* incomeRoot = makeParent(QString::fromUtf8("Доходы"));
-    QStringList incomeCats = {
-        QString::fromUtf8("Зарплата"), QString::fromUtf8("Премия"), QString::fromUtf8("Бонусы"),
-        QString::fromUtf8("Фриланс"), QString::fromUtf8("Подарки"), QString::fromUtf8("Пассивный доход"),
-        QString::fromUtf8("Дивиденды"), QString::fromUtf8("Проценты по вкладам"), QString::fromUtf8("Аренда имущества"),
-        QString::fromUtf8("Продажа вещей"), QString::fromUtf8("Прочее")
-    };
-    for (const auto& c : incomeCats) {
-        auto* item = new QStandardItem(c);
-        item->setData(1, Qt::UserRole + 1);
-        item->setData(c, Qt::UserRole + 2);
-        incomeRoot->appendRow(item);
-    }
-
-    QStandardItem* expenseRoot = makeParent(QString::fromUtf8("Расходы"));
-    QStringList expenseCats = {
-        QString::fromUtf8("Продукты"), QString::fromUtf8("Кафе и рестораны"), QString::fromUtf8("Транспорт"),
-        QString::fromUtf8("Такси"), QString::fromUtf8("ЖКХ"), QString::fromUtf8("Связь и интернет"),
-        QString::fromUtf8("Одежда и обувь"), QString::fromUtf8("Здоровье"), QString::fromUtf8("Аптека"),
-        QString::fromUtf8("Образование"), QString::fromUtf8("Подписки"), QString::fromUtf8("Развлечения"),
-        QString::fromUtf8("Путешествия"), QString::fromUtf8("Авто: топливо"), QString::fromUtf8("Авто: обслуживание"),
-        QString::fromUtf8("Дом и ремонт"), QString::fromUtf8("Дети"), QString::fromUtf8("Подарки"),
-        QString::fromUtf8("Налоги и сборы"), QString::fromUtf8("Благотворительность"), QString::fromUtf8("Прочее")
-    };
-    for (const auto& c : expenseCats) {
-        auto* item = new QStandardItem(c);
-        item->setData(0, Qt::UserRole + 1);
-        item->setData(c, Qt::UserRole + 2);
-        expenseRoot->appendRow(item);
-    }
-
-
-    auto* anyItem = new QStandardItem(QString::fromUtf8("Любая категория"));
-    anyItem->setData(-1, Qt::UserRole + 1);
-    anyItem->setData(QString(), Qt::UserRole + 2);
-    categoryModel->appendRow(anyItem);
-
-    categoryModel->appendRow(incomeRoot);
-    categoryModel->appendRow(expenseRoot);
-
-    categoryView->expandAll();
-    categoryCombo->setCurrentIndex(0);
-}
-
 void MainWindow::applyFiltersAndUpdateTable() {
-    QString nameQuery = nameSearchEdit->text().trimmed();
-    QModelIndex mi = categoryView->currentIndex();
-    int typeSel = mi.data(Qt::UserRole + 1).isValid() ? mi.data(Qt::UserRole + 1).toInt() : -1;
-    QString catSel = mi.data(Qt::UserRole + 2).toString();
-    QDate qFrom = dateFromEdit->date();
-    QDate qTo = dateToEdit->date();
+    // Сбор критериев фильтрации из UI через FiltersPanel
+    FilterCriteria criteria = filtersPanel->currentCriteria();
 
     auto all = transactionList.getAllTransactions();
-    std::list<std::shared_ptr<Transaction>> filtered;
-    
+    std::vector<std::shared_ptr<Transaction>> ordered = TransactionFilter::filterAndSort(all, criteria);
 
-    if (qFrom > qTo) {
-
-    } else {
-        for (const auto& t : all) {
-        bool ok = true;
-        if (!nameQuery.isEmpty()) {
-            ok &= QString::fromUtf8(t->getName().c_str()).contains(nameQuery, Qt::CaseInsensitive);
-        }
-        if (typeSel != -1 && !catSel.isEmpty()) {
-            ok &= (t->getType() == typeSel) && (QString::fromUtf8(t->getCategory().c_str()) == catSel);
-        }
-
-        Date td = t->getDate();
-        QDate qtd(td.getYear(), td.getMonth(), td.getDay());
-            ok &= !(qtd < qFrom) && !(qTo < qtd);
-            if (ok) filtered.push_back(t);
-        }
-    }
-
-
+    // Пересчёт баланса по отфильтрованному набору
     double total = 0.0;
-    for (const auto& t : filtered) {
+    for (const auto& t : ordered) {
         if (t->getType()) total += t->getAmount();
         else total -= t->getAmount();
     }
@@ -154,30 +78,6 @@ void MainWindow::applyFiltersAndUpdateTable() {
         "  border-left: 4px solid #388bfd; "
         "}"
     ).arg(balanceColor));
-
-
-    std::vector<std::shared_ptr<Transaction>> ordered(filtered.begin(), filtered.end());
-    
-
-    if (currentSortColumn == 4) {
-
-
-    } else if (currentSortColumn == 5) {
-
-
-    } else {
-
-        currentSortColumn = -1;
-        std::sort(ordered.begin(), ordered.end(), [](const std::shared_ptr<Transaction>& a, const std::shared_ptr<Transaction>& b) {
-            const Date& da = a->getDate();
-            const Date& db = b->getDate();
-            if (da.getYear() != db.getYear()) return da.getYear() > db.getYear();
-            if (da.getMonth() != db.getMonth()) return da.getMonth() > db.getMonth();
-            if (da.getDay() != db.getDay()) return da.getDay() > db.getDay();
-            return a->getID() > b->getID();
-        });
-    }
-
     transactionTable->setRowCount(0);
     int row = 0;
     for (const auto& transaction : ordered) {
@@ -511,74 +411,8 @@ void MainWindow::setupUI() {
     contentLayout->addWidget(leftWidget, 1);
     
 
-    searchPanel = new QWidget(this);
-    searchPanel->setObjectName("searchPanel");
-    searchPanel->setFixedWidth(280);
-    
-    QVBoxLayout* rightLayout = new QVBoxLayout(searchPanel);
-    rightLayout->setContentsMargins(16, 16, 16, 16);
-    rightLayout->setSpacing(12);
-    
-
-    QHBoxLayout* searchHeader = new QHBoxLayout();
-    QLabel* searchTitle = new QLabel(QString::fromUtf8("Поиск"), searchPanel);
-    QFont titleFont = searchTitle->font();
-    titleFont.setPointSize(12);
-    titleFont.setBold(true);
-    searchTitle->setFont(titleFont);
-    
-    analyticsButton = new QPushButton(QString::fromUtf8("Аналитика"), searchPanel);
-    analyticsButton->setCursor(Qt::PointingHandCursor);
-    
-    searchHeader->addWidget(searchTitle);
-    searchHeader->addStretch();
-    searchHeader->addWidget(analyticsButton);
-    rightLayout->addLayout(searchHeader);
-    
-
-    nameSearchEdit = new QLineEdit(searchPanel);
-    nameSearchEdit->setPlaceholderText(QString::fromUtf8("Поиск по названию"));
-    nameSearchEdit->setMinimumHeight(36);
-    rightLayout->addWidget(nameSearchEdit);
-    
-
-    categoryCombo = new QComboBox(searchPanel);
-    categoryView = new QTreeView(categoryCombo);
-    categoryModel = new QStandardItemModel(categoryCombo);
-    categoryCombo->setModel(categoryModel);
-    categoryCombo->setView(categoryView);
-    categoryCombo->setEditable(false);
-    categoryCombo->setMinimumHeight(36);
-    buildCategoryModel();
-    rightLayout->addWidget(categoryCombo);
-    
-
-    QHBoxLayout* datesLayout = new QHBoxLayout();
-    datesLayout->setSpacing(8);
-    
-    dateFromEdit = new QDateEdit(QDate::currentDate().addDays(-30), searchPanel);
-    dateFromEdit->setCalendarPopup(true);
-    dateFromEdit->setDisplayFormat("dd.MM.yyyy");
-    dateFromEdit->setMinimumHeight(36);
-    
-    dateToEdit = new QDateEdit(QDate::currentDate(), searchPanel);
-    dateToEdit->setCalendarPopup(true);
-    dateToEdit->setDisplayFormat("dd.MM.yyyy");
-    dateToEdit->setMinimumHeight(36);
-    
-    datesLayout->addWidget(dateFromEdit);
-    datesLayout->addWidget(new QLabel("-", searchPanel));
-    datesLayout->addWidget(dateToEdit);
-    rightLayout->addLayout(datesLayout);
-    
-
-    resetFiltersButton = new QPushButton(QString::fromUtf8("Сбросить фильтры"), searchPanel);
-    resetFiltersButton->setMinimumHeight(36);
-    resetFiltersButton->setCursor(Qt::PointingHandCursor);
-    rightLayout->addWidget(resetFiltersButton);
-    
-    rightLayout->addStretch();
-    contentLayout->addWidget(searchPanel);
+    filtersPanel = new FiltersPanel(this);
+    contentLayout->addWidget(filtersPanel);
     
     mainLayout->addLayout(contentLayout);
 }
@@ -611,18 +445,16 @@ void MainWindow::connectSignals() {
 
     transactionTable->horizontalHeader()->setSectionsClickable(true);
     connect(transactionTable->horizontalHeader(), &QHeaderView::sectionClicked, this, &MainWindow::onHeaderClicked);
-    connect(nameSearchEdit, &QLineEdit::textChanged, this, [this]{ applyFiltersAndUpdateTable(); });
-    connect(categoryCombo, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int){ applyFiltersAndUpdateTable(); });
-    connect(dateFromEdit, &QDateEdit::dateChanged, this, [this](const QDate&){ applyFiltersAndUpdateTable(); });
-    connect(dateToEdit, &QDateEdit::dateChanged, this, [this](const QDate&){ applyFiltersAndUpdateTable(); });
-    connect(resetFiltersButton, &QPushButton::clicked, this, [this]{
-        nameSearchEdit->clear();
-        categoryCombo->setCurrentIndex(0);
-        dateFromEdit->setDate(QDate::currentDate().addMonths(-1));
-        dateToEdit->setDate(QDate::currentDate());
+
+    connect(filtersPanel->nameSearchEdit(), &QLineEdit::textChanged, this, [this]{ applyFiltersAndUpdateTable(); });
+    connect(filtersPanel->categoryCombo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int){ applyFiltersAndUpdateTable(); });
+    connect(filtersPanel->dateFromEdit(), &QDateEdit::dateChanged, this, [this](const QDate&){ applyFiltersAndUpdateTable(); });
+    connect(filtersPanel->dateToEdit(), &QDateEdit::dateChanged, this, [this](const QDate&){ applyFiltersAndUpdateTable(); });
+    connect(filtersPanel->resetFiltersButton(), &QPushButton::clicked, this, [this]{
+        filtersPanel->resetFiltersToDefault();
         applyFiltersAndUpdateTable();
     });
-    connect(analyticsButton, &QPushButton::clicked, this, [this]{
+    connect(filtersPanel->analyticsButton(), &QPushButton::clicked, this, [this]{
         StatsDialog dlg(&transactionList, this);
         dlg.exec();
     });

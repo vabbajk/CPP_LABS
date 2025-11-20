@@ -20,6 +20,8 @@
 #include "BudgetSettings.h"
 #include "BudgetSettingsDialog.h"
 
+class FiltersPanel;
+
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
@@ -43,22 +45,13 @@ private:
     
     BudgetSettings* budgetSettings;
 
-    QWidget* searchPanel;
-    QLineEdit* nameSearchEdit;
-    QComboBox* categoryCombo;
-    QTreeView* categoryView;
-    QStandardItemModel* categoryModel;
-    QDateEdit* dateFromEdit;
-    QDateEdit* dateToEdit;
-    QPushButton* resetFiltersButton;
-    QPushButton* analyticsButton;
+    FiltersPanel* filtersPanel;
     
     void setupUI();
     void createMenuBar();
     void connectSignals();
     void updateTable();
     void updateBalance();
-    void buildCategoryModel();
     void applyFiltersAndUpdateTable();
     void updateBalanceFor(const std::list<std::shared_ptr<Transaction>>& list);
     void deleteTransactionById(size_t id);

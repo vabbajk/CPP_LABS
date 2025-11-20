@@ -1,0 +1,231 @@
+@startuml
+
+' ==== Core domain ====
+class Date {
+  - int day
+  - int month
+  - int year
+  + int getDay()
+  + int getMonth()
+  + int getYear()
+  + std::string getDate()
+}
+
+abstract class Transaction {
+  - static size_t nextID
+  - size_t id
+  - std::string name
+  - std::string category
+  - Date date
+  - double amount
+  + double getAmount()
+  + size_t getID()
+  + std::string getName()
+  + std::string getCategory()
+  + Date getDate()
+  + void print()
+  + int getType()
+}
+
+class IncomeTransaction {
+  - std::string incomeSource
+  + std::string getIncomeSource()
+}
+
+class Expense {
+  - std::string where
+  + std::string getWhere()
+}
+
+Transaction <|-- IncomeTransaction
+Transaction <|-- Expense
+
+class TransactionList {
+  - std::list<std::shared_ptr<Transaction>> transactions
+  - std::string dbFilename
+  + void addTransaction(shared_ptr<Transaction>)
+  + bool updateTransaction(size_t, shared_ptr<Transaction>)
+  + bool deleteTransaction(size_t)
+  + void loadFromDatabase()
+  + void saveToDatabase()
+  + std::list<std::shared_ptr<Transaction>> getAllTransactions() const
+  + double getTotalBalance() const
+  + double getCurrentMonthExpenses() const
+  + double getCurrentMonthIncome() const
+  + double getCurrentMonthNetSavings() const
+  + double getTotalSavings() const
+}
+
+class Database {
+  - std::string filename
+  - std::fstream file
+  + bool saveTransactionList(const TransactionList&)
+  + TransactionList loadTransactionList()
+}
+
+TransactionList --> Transaction
+TransactionList --> Database
+Database --> Transaction
+Database --> Date
+
+class TransactionQueries {
+  + static double currentMonthExpenses(const std::list<std::shared_ptr<Transaction>>&)
+  + static double currentMonthIncome(const std::list<std::shared_ptr<Transaction>>&)
+  + static double currentMonthNetSavings(const std::list<std::shared_ptr<Transaction>>&)
+  + static double totalSavings(const std::list<std::shared_ptr<Transaction>>&)
+}
+
+TransactionQueries --> Transaction
+TransactionList ..> TransactionQueries
+
+
+' ==== Budget & settings ====
+class BudgetSettings {
+  - QSettings* settings
+  + double getMonthlySalary() const
+  + void setMonthlySalary(double)
+  + double getMonthlySavings() const
+  + void setMonthlySavings(double)
+  + double getMonthlyLimit() const
+  + double getWarningThreshold() const
+  + void setWarningThreshold(double)
+  + bool shouldShowWarning(double) const
+}
+
+class BudgetSettingsDialog {
+  - BudgetSettings* budgetSettings
+  - QDoubleSpinBox* salarySpinBox
+  - QDoubleSpinBox* savingsSpinBox
+  - QDoubleSpinBox* thresholdSpinBox
+  - QLabel* limitLabel
+  - QPushButton* okButton
+  - QPushButton* cancelButton
+}
+
+BudgetSettingsDialog --> BudgetSettings
+
+
+' ==== Analytics / stats ====
+class PieChartWidget {
+}
+
+class StatsDialog {
+  - const TransactionList* transactionList
+  - QDateEdit* dateFrom
+  - QDateEdit* dateTo
+  - PieChartWidget* incomeChart
+  - PieChartWidget* expenseChart
+}
+
+StatsDialog --> TransactionList
+StatsDialog *-- PieChartWidget
+
+
+' ==== UI dialogs for transactions ====
+class AddTransactionDialog {
+  - bool isIncome
+  - QLineEdit* nameEdit
+  - QComboBox* categoryCombo
+  - QDateEdit* dateEdit
+  - QDoubleSpinBox* amountSpinBox
+  - QLineEdit* additionalInfoEdit
+  - QPushButton* okButton
+  - QPushButton* cancelButton
+  + std::shared_ptr<Transaction> getTransaction() const
+}
+
+class EditTransactionDialog {
+  - std::shared_ptr<Transaction> transaction
+  - bool isIncome
+  - QLineEdit* nameEdit
+  - QComboBox* categoryCombo
+  - QDateEdit* dateEdit
+  - QDoubleSpinBox* amountSpinBox
+  - QLineEdit* additionalInfoEdit
+  - QPushButton* okButton
+  - QPushButton* cancelButton
+  - QPushButton* deleteButton
+  - bool deleteRequested
+  + std::shared_ptr<Transaction> getUpdatedTransaction() const
+  + bool isDeleteRequested() const
+}
+
+AddTransactionDialog --> Transaction
+EditTransactionDialog --> Transaction
+
+
+' ==== Shared dialog helpers ====
+class TransactionDialogCommon <<utility>> {
+  + QStringList getIncomeCategories()
+  + QStringList getExpenseCategories()
+  + QString getCommonTransactionDialogStyleSheet()
+  + bool validateTransactionInputs(QWidget*, QLineEdit*, QComboBox*, QLineEdit*, bool)
+  + void setupTransactionDialogUI(...)
+  + std::shared_ptr<Transaction> createTransactionFromInputs(...)
+}
+
+AddTransactionDialog ..> TransactionDialogCommon
+EditTransactionDialog ..> TransactionDialogCommon
+
+
+' ==== Filters & search ====
+class FilterCriteria {
+  + QString nameQuery
+  + int typeSel
+  + QString category
+  + QDate fromDate
+  + QDate toDate
+}
+
+class TransactionFilter {
+  + static std::vector<std::shared_ptr<Transaction>> filterAndSort(
+        const std::list<std::shared_ptr<Transaction>>& all,
+        const FilterCriteria& criteria)
+}
+
+TransactionFilter --> Transaction
+FiltersPanel --> FilterCriteria
+FiltersPanel --> TransactionFilter
+
+
+class FiltersPanel {
+  - QLineEdit* nameSearchEdit_
+  - QComboBox* categoryCombo_
+  - QTreeView* categoryView_
+  - QStandardItemModel* categoryModel_
+  - QDateEdit* dateFromEdit_
+  - QDateEdit* dateToEdit_
+  - QPushButton* resetFiltersButton_
+  - QPushButton* analyticsButton_
+  + FilterCriteria currentCriteria() const
+}
+
+
+' ==== Main window ====
+class MainWindow {
+  - TransactionList transactionList
+  - QWidget* centralWidget
+  - QTableWidget* transactionTable
+  - QPushButton* addIncomeButton
+  - QPushButton* addExpenseButton
+  - QLabel* balanceLabel
+  - QLabel* budgetInfoLabel
+  - QLabel* budgetWarningLabel
+  - QProgressBar* savingsProgressBar
+  - QLabel* savingsStatusLabel
+  - QLabel* savingsForecastLabel
+  - QLabel* totalSavingsLabel
+  - BudgetSettings* budgetSettings
+  - FiltersPanel* filtersPanel
+}
+
+MainWindow --> TransactionList
+MainWindow --> AddTransactionDialog
+MainWindow --> EditTransactionDialog
+MainWindow --> StatsDialog
+MainWindow --> BudgetSettings
+MainWindow --> BudgetSettingsDialog
+MainWindow --> FiltersPanel
+
+
+@enduml
