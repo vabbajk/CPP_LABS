@@ -54,7 +54,7 @@ public:
         transactions = loaded.getAllTransactions();
     }
     
-    void saveToDatabase() {
+    void saveToDatabase() const {
         Database db(dbFilename);
         db.saveTransactionList(*this);
     }

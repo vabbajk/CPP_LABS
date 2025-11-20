@@ -44,7 +44,7 @@ private:
     QLabel* savingsForecastLabel;
     QLabel* totalSavingsLabel;
     
-    BudgetSettings* budgetSettings;
+    BudgetSettings* budgetSettings = new BudgetSettings();
 
     FiltersPanel* filtersPanel;
     

@@ -25,7 +25,7 @@
 #include <vector>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), budgetSettings(new BudgetSettings()) {
+    : QMainWindow(parent) {
     
     setWindowTitle(QString::fromUtf8("Домашняя бухгалтерия"));
     setMinimumSize(1100, 600);
@@ -216,7 +216,7 @@ void MainWindow::rebuildTransactionTable(const std::vector<std::shared_ptr<Trans
 }
 
 void MainWindow::handleEditButtonClick() {
-    QPushButton* button = qobject_cast<QPushButton*>(sender());
+    auto* button = qobject_cast<QPushButton*>(sender());
     if (!button) return;
     size_t id = static_cast<size_t>(button->property("transactionId").toULongLong());
     editTransactionById(id);

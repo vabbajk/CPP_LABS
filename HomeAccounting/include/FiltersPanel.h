@@ -22,12 +22,12 @@ public:
         setObjectName("searchPanel");
         setFixedWidth(280);
 
-        QVBoxLayout* rightLayout = new QVBoxLayout(this);
+        auto* rightLayout = new QVBoxLayout(this);
         rightLayout->setContentsMargins(16, 16, 16, 16);
         rightLayout->setSpacing(12);
 
-        QHBoxLayout* searchHeader = new QHBoxLayout();
-        QLabel* searchTitle = new QLabel(QString::fromUtf8("Поиск"), this);
+        auto* searchHeader = new QHBoxLayout();
+        auto* searchTitle = new QLabel(QString::fromUtf8("Поиск"), this);
         QFont titleFont = searchTitle->font();
         titleFont.setPointSize(12);
         titleFont.setBold(true);
@@ -56,7 +56,7 @@ public:
         buildCategoryModel();
         rightLayout->addWidget(categoryCombo_);
 
-        QHBoxLayout* datesLayout = new QHBoxLayout();
+        auto* datesLayout = new QHBoxLayout();
         datesLayout->setSpacing(8);
 
         dateFromEdit_ = new QDateEdit(QDate::currentDate().addDays(-30), this);

@@ -5,7 +5,7 @@
 
 class BudgetSettings {
 private:
-    QSettings* settings;
+    QSettings* settings = nullptr;
     static const QString ORGANIZATION_NAME;
     static const QString APPLICATION_NAME;
     static const QString SALARY_KEY;

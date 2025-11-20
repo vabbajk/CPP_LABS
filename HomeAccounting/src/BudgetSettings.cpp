@@ -6,17 +6,19 @@ const QString BudgetSettings::SALARY_KEY = "budget/monthlySalary";
 const QString BudgetSettings::SAVINGS_KEY = "budget/monthlySavings";
 const QString BudgetSettings::WARNING_THRESHOLD_KEY = "budget/warningThreshold";
 
-BudgetSettings::BudgetSettings() {
-    settings = new QSettings(ORGANIZATION_NAME, APPLICATION_NAME);
+BudgetSettings::BudgetSettings()
+    : settings(new QSettings(ORGANIZATION_NAME, APPLICATION_NAME))
+{
 }
 
 BudgetSettings::~BudgetSettings() {
     delete settings;
 }
 
-BudgetSettings::BudgetSettings(const BudgetSettings& other) {
+BudgetSettings::BudgetSettings(const BudgetSettings& other)
+    : settings(new QSettings(ORGANIZATION_NAME, APPLICATION_NAME))
+{
     (void)other;
-    settings = new QSettings(ORGANIZATION_NAME, APPLICATION_NAME);
 }
 
 BudgetSettings& BudgetSettings::operator=(const BudgetSettings& other) {
@@ -28,8 +30,9 @@ BudgetSettings& BudgetSettings::operator=(const BudgetSettings& other) {
     return *this;
 }
 
-BudgetSettings::BudgetSettings(BudgetSettings&& other) noexcept {
-    settings = other.settings;
+BudgetSettings::BudgetSettings(BudgetSettings&& other) noexcept
+    : settings(other.settings)
+{
     other.settings = nullptr;
 }
 
