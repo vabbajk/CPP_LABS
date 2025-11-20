@@ -133,7 +133,7 @@ private:
     PieChartWidget* incomeChart;
     PieChartWidget* expenseChart;
 
-    void recalc();
+    void recalc() const;
 };
 
 

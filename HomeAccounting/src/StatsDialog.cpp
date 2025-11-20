@@ -9,13 +9,12 @@ StatsDialog::StatsDialog(const TransactionList* list, QWidget* parent)
     resize(1200, 750);
     setMinimumSize(1000, 650);
 
-    QVBoxLayout* main = new QVBoxLayout(this);
+    auto* main = new QVBoxLayout(this);
     main->setSpacing(20);
     main->setContentsMargins(32, 32, 32, 32);
-
-
-    QHBoxLayout* headerLayout = new QHBoxLayout();
-    QLabel* titleLabel = new QLabel(QString::fromUtf8("📊 Финансовая аналитика"), this);
+    
+    auto* headerLayout = new QHBoxLayout();
+    auto* titleLabel = new QLabel(QString::fromUtf8("📊 Финансовая аналитика"), this);
     titleLabel->setObjectName("titleLabel");
     QFont titleFont;
     titleFont.setPointSize(18);
@@ -35,7 +34,7 @@ StatsDialog::StatsDialog(const TransactionList* list, QWidget* parent)
     main->addLayout(headerLayout);
 
 
-    QWidget* periodCard = new QWidget(this);
+    auto* periodCard = new QWidget(this);
     periodCard->setObjectName("periodCard");
     periodCard->setStyleSheet(
         "QWidget#periodCard { "
@@ -46,16 +45,16 @@ StatsDialog::StatsDialog(const TransactionList* list, QWidget* parent)
         "}"
     );
     
-    QHBoxLayout* periodLayout = new QHBoxLayout(periodCard);
+    auto* periodLayout = new QHBoxLayout(periodCard);
     periodLayout->setContentsMargins(16, 12, 16, 12);
     periodLayout->setSpacing(12);
     
-    QLabel* periodIcon = new QLabel(QString::fromUtf8("📅"), periodCard);
+    auto* periodIcon = new QLabel(QString::fromUtf8("📅"), periodCard);
     QFont iconFont;
     iconFont.setPointSize(14);
     periodIcon->setFont(iconFont);
     
-    QLabel* periodLabel = new QLabel(QString::fromUtf8("Период анализа:"), periodCard);
+    auto* periodLabel = new QLabel(QString::fromUtf8("Период анализа:"), periodCard);
     QFont labelFont;
     labelFont.setPointSize(11);
     labelFont.setBold(true);
@@ -66,7 +65,7 @@ StatsDialog::StatsDialog(const TransactionList* list, QWidget* parent)
     dateFrom->setDisplayFormat("dd.MM.yyyy");
     dateFrom->setMinimumWidth(140);
     
-    QLabel* separator = new QLabel(QString::fromUtf8("—"), periodCard);
+    auto* separator = new QLabel(QString::fromUtf8("—"), periodCard);
     separator->setStyleSheet("color: #7d8590; font-size: 12pt;");
     
     dateTo = new QDateEdit(QDate::currentDate(), periodCard);
@@ -82,9 +81,8 @@ StatsDialog::StatsDialog(const TransactionList* list, QWidget* parent)
     periodLayout->addStretch();
     
     main->addWidget(periodCard);
-
-
-    QHBoxLayout* charts = new QHBoxLayout();
+    
+    auto* charts = new QHBoxLayout();
     charts->setSpacing(20);
     
     incomeChart = new PieChartWidget(this);
@@ -107,10 +105,9 @@ StatsDialog::StatsDialog(const TransactionList* list, QWidget* parent)
     charts->addWidget(incomeChart);
     charts->addWidget(expenseChart);
     main->addLayout(charts);
-
-
-    QDialogButtonBox* closeBox = new QDialogButtonBox(QDialogButtonBox::Close, this);
-    QPushButton* closeBtn = closeBox->button(QDialogButtonBox::Close);
+    
+    auto* closeBox = new QDialogButtonBox(QDialogButtonBox::Close, this);
+    auto* closeBtn = closeBox->button(QDialogButtonBox::Close);
     if (closeBtn) {
         closeBtn->setText(QString::fromUtf8("Закрыть"));
         closeBtn->setMinimumHeight(40);
@@ -199,10 +196,10 @@ StatsDialog::StatsDialog(const TransactionList* list, QWidget* parent)
     recalc();
 }
 
-void StatsDialog::recalc() {
+void StatsDialog::recalc() const {
     if (!transactionList) return;
-    QDate qFrom = dateFrom->date();
-    QDate qTo = dateTo->date();
+    auto qFrom = dateFrom->date();
+    auto qTo = dateTo->date();
 
     QMap<QString, double> incomeAgg;
     QMap<QString, double> expenseAgg;

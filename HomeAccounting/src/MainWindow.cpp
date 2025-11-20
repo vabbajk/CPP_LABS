@@ -89,7 +89,7 @@ void MainWindow::rebuildTransactionTable(const std::vector<std::shared_ptr<Trans
     int row = 0;
     for (const auto& transaction : ordered) {
         transactionTable->insertRow(row);
-        QTableWidgetItem* iconItem = new QTableWidgetItem();
+        auto* iconItem = new QTableWidgetItem();
         if (transaction->getType() == 1) {
             iconItem->setText("+");
             iconItem->setForeground(QBrush(QColor("#2ecc71")));
@@ -104,9 +104,7 @@ void MainWindow::rebuildTransactionTable(const std::vector<std::shared_ptr<Trans
         iconItem->setTextAlignment(Qt::AlignCenter);
         iconItem->setData(Qt::BackgroundRole, QColor(0, 0, 0, 0));
         transactionTable->setItem(row, 0, iconItem);
-
-
-        QTableWidgetItem* idItem = new QTableWidgetItem(QString::number(transaction->getID()));
+        auto* idItem = new QTableWidgetItem(QString::number(transaction->getID()));
         idItem->setTextAlignment(Qt::AlignCenter);
         transactionTable->setItem(row, 1, idItem);
         
@@ -115,14 +113,11 @@ void MainWindow::rebuildTransactionTable(const std::vector<std::shared_ptr<Trans
         
 
         transactionTable->setItem(row, 3, new QTableWidgetItem(QString::fromUtf8(transaction->getCategory().c_str())));
-        
-
-        QTableWidgetItem* dateItem = new QTableWidgetItem(QString::fromStdString(transaction->getDate().getDate()));
+                auto* dateItem = new QTableWidgetItem(QString::fromStdString(transaction->getDate().getDate()));
         dateItem->setTextAlignment(Qt::AlignCenter);
         transactionTable->setItem(row, 4, dateItem);
         
-
-        QTableWidgetItem* amountItem = new QTableWidgetItem(QString::number(transaction->getAmount(), 'f', 2));
+        auto* amountItem = new QTableWidgetItem(QString::number(transaction->getAmount(), 'f', 2));
         amountItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         transactionTable->setItem(row, 5, amountItem);
 
@@ -145,14 +140,13 @@ void MainWindow::rebuildTransactionTable(const std::vector<std::shared_ptr<Trans
         
 
         transactionTable->setItem(row, 7, new QTableWidgetItem(additionalInfo));
-
-        QWidget* actionWidget = new QWidget(this);
-        QHBoxLayout* actionLayout = new QHBoxLayout(actionWidget);
+        auto* actionWidget = new QWidget(this);
+        auto* actionLayout = new QHBoxLayout(actionWidget);
         actionLayout->setContentsMargins(8, 2, 8, 2);
         actionLayout->setSpacing(0);
         actionLayout->setAlignment(Qt::AlignCenter);
         
-        QPushButton* editRowButton = new QPushButton(QString::fromUtf8("Редакт."), actionWidget);
+        auto* editRowButton = new QPushButton(QString::fromUtf8("Редакт."), actionWidget);
         editRowButton->setFixedSize(85, 28);
         editRowButton->setToolTip(QString::fromUtf8("Редактировать транзакцию"));
         editRowButton->setStyleSheet(
@@ -231,13 +225,12 @@ void MainWindow::setupUI() {
     centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
     
-    QVBoxLayout* mainLayout = new QVBoxLayout(centralWidget);
+    auto* mainLayout = new QVBoxLayout(centralWidget);
     mainLayout->setContentsMargins(12, 12, 12, 12);
     mainLayout->setSpacing(12);
 
-
-
-    QHBoxLayout* topLayout = new QHBoxLayout();
+    
+    auto* topLayout = new QHBoxLayout();
     balanceLabel = new QLabel(QString::fromUtf8("Баланс: 0.00 руб."), this);
     balanceLabel->setObjectName("balanceLabel");
     QFont balanceFont = balanceLabel->font();
@@ -270,15 +263,14 @@ void MainWindow::setupUI() {
     QHBoxLayout* warningLayout = new QHBoxLayout();
     warningLayout->addWidget(budgetWarningLabel);
     mainLayout->addLayout(warningLayout);
-
-
-    QFrame* savingsCard = new QFrame(this);
+    
+    auto* savingsCard = new QFrame(this);
     savingsCard->setObjectName("savingsCard");
-    QVBoxLayout* savingsLayout = new QVBoxLayout(savingsCard);
+    auto* savingsLayout = new QVBoxLayout(savingsCard);
     savingsLayout->setContentsMargins(16, 16, 16, 16);
     savingsLayout->setSpacing(10);
 
-    QLabel* savingsTitleLabel = new QLabel(QString::fromUtf8("Радар накоплений"), savingsCard);
+    auto* savingsTitleLabel = new QLabel(QString::fromUtf8("Радар накоплений"), savingsCard);
     QFont savingsTitleFont = savingsTitleLabel->font();
     savingsTitleFont.setPointSize(12);
     savingsTitleFont.setBold(true);
@@ -305,13 +297,13 @@ void MainWindow::setupUI() {
     mainLayout->addWidget(savingsCard);
     
 
-    QFrame* savingsCounterCard = new QFrame(this);
+    auto* savingsCounterCard = new QFrame(this);
     savingsCounterCard->setObjectName("savingsCard");
-    QVBoxLayout* counterLayout = new QVBoxLayout(savingsCounterCard);
+    auto* counterLayout = new QVBoxLayout(savingsCounterCard);
     counterLayout->setContentsMargins(16, 16, 16, 16);
     counterLayout->setSpacing(10);
     
-    QLabel* counterTitleLabel = new QLabel(QString::fromUtf8("Счетчик накоплений"), savingsCounterCard);
+    auto* counterTitleLabel = new QLabel(QString::fromUtf8("Счетчик накоплений"), savingsCounterCard);
     QFont counterTitleFont = counterTitleLabel->font();
     counterTitleFont.setPointSize(12);
     counterTitleFont.setBold(true);
@@ -328,16 +320,14 @@ void MainWindow::setupUI() {
     mainLayout->addWidget(savingsCounterCard);
     
     mainLayout->setContentsMargins(12, 8, 12, 8);
-
-
-
-
-    QHBoxLayout* contentLayout = new QHBoxLayout();
-    contentLayout->setSpacing(16);
     
-
-    QWidget* leftWidget = new QWidget(this);
-    QVBoxLayout* leftLayout = new QVBoxLayout(leftWidget);
+    
+    
+    auto* contentLayout = new QHBoxLayout();
+    contentLayout->setSpacing(16);
+        
+    auto* leftWidget = new QWidget(this);
+    auto* leftLayout = new QVBoxLayout(leftWidget);
     leftLayout->setContentsMargins(0, 0, 0, 0);
     leftLayout->setSpacing(12);
     
@@ -380,9 +370,8 @@ void MainWindow::setupUI() {
     transactionTable->verticalHeader()->setDefaultSectionSize(36);
     
     leftLayout->addWidget(transactionTable);
-    
-
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
+        
+    auto* buttonLayout = new QHBoxLayout();
     buttonLayout->setSpacing(12);
     
     addIncomeButton = new QPushButton(QString::fromUtf8("+ Добавить доход"), this);
@@ -410,24 +399,24 @@ void MainWindow::setupUI() {
 }
 
 void MainWindow::createMenuBar() {
-    QMenuBar* menuBar = new QMenuBar(this);
+    auto* menuBar = new QMenuBar(this);
     setMenuBar(menuBar);
     
-    QMenu* fileMenu = menuBar->addMenu(QString::fromUtf8("Файл"));
+    auto* fileMenu = menuBar->addMenu(QString::fromUtf8("Файл"));
     fileMenu->addSeparator();
-    QAction* exitAction = fileMenu->addAction(QString::fromUtf8("Выход"));
+    auto* exitAction = fileMenu->addAction(QString::fromUtf8("Выход"));
     
     connect(exitAction, &QAction::triggered, this, &QMainWindow::close);
     
-    QMenu* helpMenu = menuBar->addMenu(QString::fromUtf8("Справка"));
-    QAction* aboutAction = helpMenu->addAction(QString::fromUtf8("О программе"));
+    auto* helpMenu = menuBar->addMenu(QString::fromUtf8("Справка"));
+    auto* aboutAction = helpMenu->addAction(QString::fromUtf8("О программе"));
     connect(aboutAction, &QAction::triggered, this, &MainWindow::onAbout);
 
-    QMenu* settingsMenu = menuBar->addMenu(QString::fromUtf8("Настройки"));
-    QAction* budgetSettingsAction = settingsMenu->addAction(QString::fromUtf8("Настройка бюджета..."));
+    auto* settingsMenu = menuBar->addMenu(QString::fromUtf8("Настройки"));
+    auto* budgetSettingsAction = settingsMenu->addAction(QString::fromUtf8("Настройка бюджета..."));
     connect(budgetSettingsAction, &QAction::triggered, this, &MainWindow::onBudgetSettings);
     settingsMenu->addSeparator();
-    QAction* exportTxtAction = settingsMenu->addAction(QString::fromUtf8("Выгрузить все транзакции в TXT..."));
+    auto* exportTxtAction = settingsMenu->addAction(QString::fromUtf8("Выгрузить все транзакции в TXT..."));
     connect(exportTxtAction, &QAction::triggered, this, &MainWindow::onExportTxt);
 }
 
@@ -851,7 +840,7 @@ void MainWindow::updateTable() {
         transactionTable->insertRow(row);
 
 
-        QTableWidgetItem* iconItem = new QTableWidgetItem();
+        auto* iconItem = new QTableWidgetItem();
         if (transaction->getType() == 1) {
             iconItem->setText("+");
             iconItem->setForeground(QBrush(Qt::green));
@@ -861,9 +850,7 @@ void MainWindow::updateTable() {
         }
         iconItem->setTextAlignment(Qt::AlignCenter);
         transactionTable->setItem(row, 0, iconItem);
-
-
-        QTableWidgetItem* idItem = new QTableWidgetItem(QString::number(transaction->getID()));
+        auto* idItem = new QTableWidgetItem(QString::number(transaction->getID()));
         idItem->setTextAlignment(Qt::AlignCenter);
         transactionTable->setItem(row, 1, idItem);
 
@@ -872,14 +859,10 @@ void MainWindow::updateTable() {
 
 
         transactionTable->setItem(row, 3, new QTableWidgetItem(QString::fromUtf8(transaction->getCategory().c_str())));
-
-
-        QTableWidgetItem* dateItem = new QTableWidgetItem(QString::fromStdString(transaction->getDate().getDate()));
+        auto* dateItem = new QTableWidgetItem(QString::fromStdString(transaction->getDate().getDate()));
         dateItem->setTextAlignment(Qt::AlignCenter);
         transactionTable->setItem(row, 4, dateItem);
-
-
-        QTableWidgetItem* amountItem = new QTableWidgetItem(QString::number(transaction->getAmount(), 'f', 2));
+        auto* amountItem = new QTableWidgetItem(QString::number(transaction->getAmount(), 'f', 2));
         amountItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         transactionTable->setItem(row, 5, amountItem);
 
@@ -904,18 +887,16 @@ void MainWindow::updateTable() {
         transactionTable->setItem(row, 6, typeItem);
 
         transactionTable->setItem(row, 7, new QTableWidgetItem(additionalInfo));
-
-
-        QWidget* actionWidget = new QWidget(this);
-        QHBoxLayout* actionLayout = new QHBoxLayout(actionWidget);
+        
+        auto* actionWidget = new QWidget(this);
+        auto* actionLayout = new QHBoxLayout(actionWidget);
         actionLayout->setContentsMargins(4, 0, 4, 0);
         actionLayout->setSpacing(0);
         actionLayout->setAlignment(Qt::AlignCenter);
 
 
-        actionWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-
-        QPushButton* editRowButton = new QPushButton(QString::fromUtf8("Редакт."), actionWidget);
+        actionWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);        
+        auto* editRowButton = new QPushButton(QString::fromUtf8("Редакт."), actionWidget);
         editRowButton->setFixedHeight(30);
         editRowButton->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
         editRowButton->setCursor(Qt::PointingHandCursor);
@@ -1027,7 +1008,7 @@ void MainWindow::onEditTransaction() {
         return;
     }
     
-    QTableWidgetItem* idItem = transactionTable->item(currentRow, 1);
+    auto* idItem = transactionTable->item(currentRow, 1);
     if (!idItem) return;
     size_t id = idItem->text().toULongLong();
     editTransactionById(id);
@@ -1127,7 +1108,7 @@ void MainWindow::deleteTransactionById(size_t id) {
 void MainWindow::deleteSelectedRow() {
     int row = transactionTable->currentRow();
     if (row < 0) return;
-    QTableWidgetItem* idItem = transactionTable->item(row, 1);
+    auto* idItem = transactionTable->item(row, 1);
     if (!idItem) return;
     size_t id = idItem->text().toULongLong();
     deleteTransactionById(id);
@@ -1161,9 +1142,9 @@ void MainWindow::editTransactionById(size_t id) {
 void MainWindow::onTableContextMenu(const QPoint& pos) {
     QModelIndex index = transactionTable->indexAt(pos);
     QMenu menu(this);
-    QAction* editAct = menu.addAction(QString::fromUtf8("Редактировать"));
-    QAction* delAct = menu.addAction(QString::fromUtf8("Удалить"));
-    QAction* chosen = menu.exec(transactionTable->viewport()->mapToGlobal(pos));
+    auto* editAct = menu.addAction(QString::fromUtf8("Редактировать"));
+    auto* delAct = menu.addAction(QString::fromUtf8("Удалить"));
+    auto* chosen = menu.exec(transactionTable->viewport()->mapToGlobal(pos));
     if (!chosen) return;
     int row = index.isValid() ? index.row() : transactionTable->currentRow();
     if (row < 0) return;
