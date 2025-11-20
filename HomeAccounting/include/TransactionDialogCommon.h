@@ -169,9 +169,9 @@ inline QString getCommonTransactionDialogStyleSheet() {
 }
 
 inline bool validateTransactionInputs(QWidget* parent,
-                                      QLineEdit* nameEdit,
-                                      QComboBox* categoryCombo,
-                                      QLineEdit* additionalInfoEdit,
+                                      const QLineEdit* nameEdit,
+                                      const QComboBox* categoryCombo,
+                                      const QLineEdit* additionalInfoEdit,
                                       bool isIncome) {
     if (!nameEdit || nameEdit->text().trimmed().isEmpty()) {
         QMessageBox::warning(parent,
@@ -220,7 +220,7 @@ inline void setupTransactionDialogUI(
     mainLayout->setSpacing(16);
     mainLayout->setContentsMargins(24, 24, 24, 24);
 
-    QFormLayout* formLayout = new QFormLayout();
+    auto* formLayout = new QFormLayout();
     formLayout->setSpacing(12);
     formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
@@ -267,7 +267,7 @@ inline void setupTransactionDialogUI(
     mainLayout->addLayout(formLayout);
     mainLayout->addSpacing(8);
 
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    auto* buttonLayout = new QHBoxLayout();
     buttonLayout->setSpacing(12);
 
     if (withDeleteButton) {

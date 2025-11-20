@@ -3,6 +3,7 @@
 #include <memory>
 #include <algorithm>
 #include <iostream>
+#include <string_view>
 #include "Transaction.h"
 #include "Database.h"
 
@@ -28,12 +29,10 @@ public:
     
 
     bool updateTransaction(size_t id, const std::shared_ptr<Transaction>& newTransaction) {
-        auto it = std::find_if(transactions.begin(), transactions.end(),
+        if (auto it = std::find_if(transactions.begin(), transactions.end(),
             [id](const std::shared_ptr<Transaction>& t) {
                 return t->getID() == id;
-            });
-        
-        if (it != transactions.end()) {
+            }); it != transactions.end()) {
             *it = newTransaction;
             return true;
         }
@@ -64,13 +63,13 @@ public:
         return transactions;
     }
 
-    void removeByName(const std::string& name) {
+    void removeByName(std::string_view name) {
         transactions.remove_if([name](const std::shared_ptr<Transaction>& t) {
             return t->getName() == name;
         });
     }
 
-    std::list<std::shared_ptr<Transaction>> findByName(const std::string& name) const {
+    std::list<std::shared_ptr<Transaction>> findByName(std::string_view name) const {
         std::list<std::shared_ptr<Transaction>> result;
         for (const auto& t : transactions) {
             if (t->getName() == name)
@@ -79,7 +78,7 @@ public:
         return result;
     }
 
-    std::list<std::shared_ptr<Transaction>> findByCategory(const std::string& category) const {
+    std::list<std::shared_ptr<Transaction>> findByCategory(std::string_view category) const {
         std::list<std::shared_ptr<Transaction>> result;
         for (const auto& t : transactions) {
             if (t->getCategory() == category)

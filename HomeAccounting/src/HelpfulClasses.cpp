@@ -2,7 +2,8 @@
 
 #include <chrono>
 #include <ctime>
-#include <format>
+#include <sstream>
+#include <iomanip>
 
 Date::Date(){
     using std::chrono::system_clock;
@@ -36,5 +37,9 @@ int Date::getYear() const {
 }
 
 std::string Date::getDate() const{
-	return std::format("{:02}.{:02}.{}", day, month, year);
+	std::ostringstream oss;
+	oss << std::setw(2) << std::setfill('0') << day << "."
+		<< std::setw(2) << std::setfill('0') << month << "."
+		<< year;
+	return oss.str();
 }
