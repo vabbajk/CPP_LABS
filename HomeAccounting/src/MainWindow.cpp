@@ -116,7 +116,7 @@ void MainWindow::setupUI() {
     topLayout->addWidget(balanceLabel);
     
 
-    QLabel* budgetInfoLabel = new QLabel(this);
+    auto* budgetInfoLabel = new QLabel(this);
     budgetInfoLabel->setTextFormat(Qt::RichText);
     QFont budgetFont = budgetInfoLabel->font();
     budgetFont.setPointSize(10);
@@ -125,7 +125,7 @@ void MainWindow::setupUI() {
     topLayout->addWidget(budgetInfoLabel, 1);
     
 
-    QLabel* budgetWarningLabel = new QLabel(this);
+    auto* budgetWarningLabel = new QLabel(this);
     budgetWarningLabel->setVisible(false);
     budgetWarningLabel->setWordWrap(true);
     budgetWarningLabel->setTextFormat(Qt::RichText);
@@ -155,17 +155,17 @@ void MainWindow::setupUI() {
     savingsTitleLabel->setFont(savingsTitleFont);
     savingsLayout->addWidget(savingsTitleLabel);
 
-    QLabel* savingsStatusLabel = new QLabel(savingsCard);
+    auto* savingsStatusLabel = new QLabel(savingsCard);
     savingsStatusLabel->setTextFormat(Qt::RichText);
     savingsLayout->addWidget(savingsStatusLabel);
 
-    QProgressBar* savingsProgressBar = new QProgressBar(savingsCard);
+    auto* savingsProgressBar = new QProgressBar(savingsCard);
     savingsProgressBar->setRange(0, 100);
     savingsProgressBar->setTextVisible(false);
     savingsProgressBar->setFixedHeight(14);
     savingsLayout->addWidget(savingsProgressBar);
 
-    QLabel* savingsForecastLabel = new QLabel(savingsCard);
+    auto* savingsForecastLabel = new QLabel(savingsCard);
     savingsForecastLabel->setTextFormat(Qt::RichText);
     QFont forecastFont = savingsForecastLabel->font();
     forecastFont.setPointSize(9);
@@ -188,7 +188,7 @@ void MainWindow::setupUI() {
     counterTitleLabel->setFont(counterTitleFont);
     counterLayout->addWidget(counterTitleLabel);
     
-    QLabel* totalSavingsLabel = new QLabel(savingsCounterCard);
+    auto* totalSavingsLabel = new QLabel(savingsCounterCard);
     totalSavingsLabel->setTextFormat(Qt::RichText);
     QFont totalSavingsFont = totalSavingsLabel->font();
     totalSavingsFont.setPointSize(11);

@@ -3,9 +3,7 @@
 #include <cmath>
 
 SavingsTracker::SavingsTracker(BudgetSettings* settings, TransactionList* transactionList, QObject* parent)
-    : QObject(parent), budgetSettings_(settings), transactionList_(transactionList),
-      savingsProgressBar_(nullptr), savingsStatusLabel_(nullptr), 
-      savingsForecastLabel_(nullptr), totalSavingsLabel_(nullptr) {
+    : QObject(parent), budgetSettings_(settings), transactionList_(transactionList) {
 }
 
 void SavingsTracker::setWidgets(QProgressBar* progressBar, QLabel* statusLabel, 
@@ -32,7 +30,7 @@ void SavingsTracker::updateSavingsRadar() {
     }
 
     double progress = (plannedSavings > 0.0) ? (actualSavings / plannedSavings) * 100.0 : 0.0;
-    int progressValue = static_cast<int>(std::round(std::clamp(progress, 0.0, 200.0)));
+    auto progressValue = static_cast<int>(std::round(std::clamp(progress, 0.0, 200.0)));
     savingsProgressBar_->setValue(std::min(progressValue, 100));
 
     QString color = "#4caf50";

@@ -1,8 +1,7 @@
 #include "../include/BudgetManager.h"
 
 BudgetManager::BudgetManager(BudgetSettings* settings, TransactionList* transactionList, QObject* parent)
-    : QObject(parent), budgetSettings_(settings), transactionList_(transactionList),
-      budgetInfoLabel_(nullptr), budgetWarningLabel_(nullptr) {
+    : QObject(parent), budgetSettings_(settings), transactionList_(transactionList) {
 }
 
 void BudgetManager::setLabels(QLabel* infoLabel, QLabel* warningLabel) {

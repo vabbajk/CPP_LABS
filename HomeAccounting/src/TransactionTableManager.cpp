@@ -148,13 +148,13 @@ void TransactionTableManager::createTableRow(int row, const std::shared_ptr<Tran
     table_->setItem(row, 7, new QTableWidgetItem(additionalInfo));
     
     // Actions
-    QWidget* actionWidget = new QWidget(parent_);
-    QHBoxLayout* actionLayout = new QHBoxLayout(actionWidget);
+    auto* actionWidget = new QWidget(parent_);
+    auto* actionLayout = new QHBoxLayout(actionWidget);
     actionLayout->setContentsMargins(8, 2, 8, 2);
     actionLayout->setSpacing(0);
     actionLayout->setAlignment(Qt::AlignCenter);
     
-    QPushButton* editButton = createEditButton(transaction->getID());
+    auto* editButton = createEditButton(transaction->getID());
     actionLayout->addWidget(editButton);
     table_->setCellWidget(row, 8, actionWidget);
 }
@@ -189,13 +189,13 @@ void TransactionTableManager::onEditButtonClicked() {
     const auto* button = qobject_cast<const QPushButton*>(sender());
     if (!button) return;
     auto id = button->property("transactionId").toULongLong();
-    emit editRequested(static_cast<size_t>(id));
+    emit editRequested(id);
 }
 
 void TransactionTableManager::onTableDoubleClicked(int row, int column) {
-    Q_UNUSED(column);
+    (void)column;
     if (row < 0 || row >= table_->rowCount()) return;
-    QTableWidgetItem* idItem = table_->item(row, 1);
+    const auto* idItem = table_->item(row, 1);
     if (!idItem) return;
     size_t id = idItem->text().toULongLong();
     emit editRequested(id);
@@ -204,14 +204,14 @@ void TransactionTableManager::onTableDoubleClicked(int row, int column) {
 void TransactionTableManager::onTableContextMenu(const QPoint& pos) {
     QModelIndex index = table_->indexAt(pos);
     QMenu menu(parent_);
-    QAction* editAct = menu.addAction(QString::fromUtf8("Редактировать"));
-    QAction* delAct = menu.addAction(QString::fromUtf8("Удалить"));
-    QAction* chosen = menu.exec(table_->viewport()->mapToGlobal(pos));
+    const auto* editAct = menu.addAction(QString::fromUtf8("Редактировать"));
+    const auto* delAct = menu.addAction(QString::fromUtf8("Удалить"));
+    const auto* chosen = menu.exec(table_->viewport()->mapToGlobal(pos));
     if (!chosen) return;
     
     int row = index.isValid() ? index.row() : table_->currentRow();
     if (row < 0) return;
-    QTableWidgetItem* idItem = table_->item(row, 1);
+    const auto* idItem = table_->item(row, 1);
     if (!idItem) return;
     size_t id = idItem->text().toULongLong();
     

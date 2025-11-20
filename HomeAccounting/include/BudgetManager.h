@@ -18,8 +18,8 @@ public:
 private:
     BudgetSettings* budgetSettings_;
     TransactionList* transactionList_;
-    QLabel* budgetInfoLabel_;
-    QLabel* budgetWarningLabel_;
+    QLabel* budgetInfoLabel_ = nullptr;
+    QLabel* budgetWarningLabel_ = nullptr;
     
     void updateBudgetWarning();
 };

@@ -18,9 +18,9 @@ public:
 private:
     BudgetSettings* budgetSettings_;
     TransactionList* transactionList_;
-    QProgressBar* savingsProgressBar_;
-    QLabel* savingsStatusLabel_;
-    QLabel* savingsForecastLabel_;
-    QLabel* totalSavingsLabel_;
+    QProgressBar* savingsProgressBar_ = nullptr;
+    QLabel* savingsStatusLabel_ = nullptr;
+    QLabel* savingsForecastLabel_ = nullptr;
+    QLabel* totalSavingsLabel_ = nullptr;
 };
 

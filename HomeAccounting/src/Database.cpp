@@ -62,8 +62,7 @@ bool Database::isOpen() const {
 
 
 bool Database::writeBytes(const std::byte* data, std::size_t size) {
-    const auto* charData = reinterpret_cast<const char*>(data);
-    if (!file.write(charData, static_cast<std::streamsize>(size))) {
+    if (const auto* charData = reinterpret_cast<const char*>(data); !file.write(charData, static_cast<std::streamsize>(size))) {
         return false;
     }
     return file.good();
