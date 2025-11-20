@@ -62,16 +62,16 @@ bool Database::isOpen() const {
 
 
 bool Database::writeBytes(const std::byte* data, std::size_t size) {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast): std::fstream requires char* interface
-    if (!file.write(reinterpret_cast<const char*>(data), static_cast<std::streamsize>(size))) {
+    // std::fstream requires char* interface, reinterpret_cast is necessary
+    if (!file.write(reinterpret_cast<const char*>(data), static_cast<std::streamsize>(size))) { // NOSONAR
         return false;
     }
     return file.good();
 }
 
 void Database::readBytes(std::byte* data, std::size_t size) {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast): std::fstream requires char* interface
-    file.read(reinterpret_cast<char*>(data), static_cast<std::streamsize>(size));
+    // std::fstream requires char* interface, reinterpret_cast is necessary
+    file.read(reinterpret_cast<char*>(data), static_cast<std::streamsize>(size)); // NOSONAR
 }
 
 
