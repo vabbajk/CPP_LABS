@@ -704,13 +704,13 @@ void MainWindow::onEditTransaction() {
     
     const auto* idItem = transactionTable->item(currentRow, 1);
     if (!idItem) return;
-        size_t id = idItem->text().toULongLong();
+    size_t id = idItem->text().toULongLong();
     onEditRequested(id);
 }
 
 void MainWindow::onHeaderClicked(int logicalIndex) {
     tableManager->handleHeaderClick(logicalIndex, transactionList, currentSortColumn, dateSortAscending, amountSortAscending);
-        applyFiltersAndUpdateTable();
+    applyFiltersAndUpdateTable();
 }
 
 void MainWindow::onExportTxt() {
