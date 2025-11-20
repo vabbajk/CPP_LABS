@@ -217,27 +217,9 @@ void MainWindow::rebuildTransactionTable(const std::vector<std::shared_ptr<Trans
 
 void MainWindow::handleEditButtonClick() {
     QPushButton* button = qobject_cast<QPushButton*>(sender());
+    if (!button) return;
     size_t id = static_cast<size_t>(button->property("transactionId").toULongLong());
-    auto transactionsLocal = transactionList.getAllTransactions();
-    for (const auto& trans : transactionsLocal) {
-        if (trans->getID() == id) {
-            EditTransactionDialog dialog(trans, this);
-            if (dialog.exec() == QDialog::Accepted) {
-                if (dialog.isDeleteRequested()) {
-                    deleteTransactionById(id);
-                } else {
-                    auto updatedTransaction = dialog.getUpdatedTransaction();
-                    transactionList.updateTransaction(id, updatedTransaction);
-                    transactionList.saveToDatabase();
-                    applyFiltersAndUpdateTable();
-                    checkBudgetLimit();
-                    updateSavingsRadar();
-                    updateSavingsCounter();
-                }
-            }
-            break;
-        }
-    }
+    editTransactionById(id);
 }
 
 MainWindow::~MainWindow() {
@@ -1045,26 +1027,10 @@ void MainWindow::onEditTransaction() {
         return;
     }
     
-    QTableWidgetItem* idItem = transactionTable->item(currentRow, 0);
-    if (idItem) {
-        size_t id = idItem->text().toULongLong();
-        
-
-        auto transactions = transactionList.getAllTransactions();
-        for (const auto& trans : transactions) {
-            if (trans->getID() == id) {
-                EditTransactionDialog dialog(trans, this);
-                if (dialog.exec() == QDialog::Accepted) {
-                    auto updatedTransaction = dialog.getUpdatedTransaction();
-                    transactionList.updateTransaction(id, updatedTransaction);
-                    transactionList.saveToDatabase();
-                    updateTable();
-                    updateBalance();
-                }
-                break;
-            }
-        }
-    }
+    QTableWidgetItem* idItem = transactionTable->item(currentRow, 1);
+    if (!idItem) return;
+    size_t id = idItem->text().toULongLong();
+    editTransactionById(id);
 }
 
 void MainWindow::onTableDoubleClicked(int row, int column) {
@@ -1136,11 +1102,12 @@ void MainWindow::onExportTxt() {
 }
 
 void MainWindow::onApplyFilter() {
-
+    applyFiltersAndUpdateTable();
 }
 
 void MainWindow::onClearFilter() {
-
+    filtersPanel->resetFiltersToDefault();
+    applyFiltersAndUpdateTable();
 }
 
 void MainWindow::deleteTransactionById(size_t id) {
@@ -1168,25 +1135,27 @@ void MainWindow::deleteSelectedRow() {
 
 void MainWindow::editTransactionById(size_t id) {
     auto transactionsLocal = transactionList.getAllTransactions();
-    for (const auto& trans : transactionsLocal) {
-        if (trans->getID() == id) {
-            EditTransactionDialog dialog(trans, this);
-            if (dialog.exec() == QDialog::Accepted) {
-                if (dialog.isDeleteRequested()) {
-                    deleteTransactionById(id);
-                } else {
-                    auto updatedTransaction = dialog.getUpdatedTransaction();
-                    transactionList.updateTransaction(id, updatedTransaction);
-                    transactionList.saveToDatabase();
-                    applyFiltersAndUpdateTable();
-                    checkBudgetLimit();
-                    updateSavingsRadar();
-                    updateSavingsCounter();
-                }
-            }
-            break;
-        }
+    auto it = std::find_if(transactionsLocal.begin(), transactionsLocal.end(),
+        [id](const std::shared_ptr<Transaction>& t) {
+            return t->getID() == id;
+        });
+    if (it == transactionsLocal.end()) return;
+
+    EditTransactionDialog dialog(*it, this);
+    if (dialog.exec() != QDialog::Accepted) return;
+
+    if (dialog.isDeleteRequested()) {
+        deleteTransactionById(id);
+        return;
     }
+
+    auto updatedTransaction = dialog.getUpdatedTransaction();
+    transactionList.updateTransaction(id, updatedTransaction);
+    transactionList.saveToDatabase();
+    applyFiltersAndUpdateTable();
+    checkBudgetLimit();
+    updateSavingsRadar();
+    updateSavingsCounter();
 }
 
 void MainWindow::onTableContextMenu(const QPoint& pos) {
