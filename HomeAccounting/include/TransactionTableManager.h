@@ -17,8 +17,7 @@ public:
     
     void rebuildTable(const std::vector<std::shared_ptr<Transaction>>& transactions);
     void setupTable();
-    // NOLINTNEXTLINE(readability-make-member-function-const): modifies external table_ object via pointer
-    void handleHeaderClick(int logicalIndex, TransactionList& transactionList, int& currentSortColumn, bool& dateSortAscending, bool& amountSortAscending);
+    void handleHeaderClick(int logicalIndex, TransactionList& transactionList, int& currentSortColumn, bool& dateSortAscending, bool& amountSortAscending); // NOSONAR
     
 signals:
     void editRequested(size_t transactionId);
