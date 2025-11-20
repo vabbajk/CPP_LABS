@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <memory>
+#include <cstddef>
 #include "Transaction.h"
 
 
@@ -17,13 +18,13 @@ private:
     bool writeDate(const Date& date);
     bool writeDouble(double value);
     bool writeSize(size_t value);
-    bool writeBytes(const void* data, std::size_t size);
+    bool writeBytes(const std::byte* data, std::size_t size);
     
     std::string readString();
     Date readDate();
     double readDouble();
     size_t readSize();
-    void readBytes(void* data, std::size_t size);
+    void readBytes(std::byte* data, std::size_t size);
     
 
     bool writeTransaction(const Transaction& transaction);

@@ -61,17 +61,15 @@ bool Database::isOpen() const {
 }
 
 
-bool Database::writeBytes(const void* data, std::size_t size) {
-    const auto* bytes = static_cast<const std::byte*>(data);
-    if (!file.write(reinterpret_cast<const char*>(bytes), static_cast<std::streamsize>(size))) {
+bool Database::writeBytes(const std::byte* data, std::size_t size) {
+    if (!file.write(reinterpret_cast<const char*>(data), static_cast<std::streamsize>(size))) {
         return false;
     }
     return file.good();
 }
 
-void Database::readBytes(void* data, std::size_t size) {
-    auto* bytes = static_cast<std::byte*>(data);
-    file.read(reinterpret_cast<char*>(bytes), static_cast<std::streamsize>(size));
+void Database::readBytes(std::byte* data, std::size_t size) {
+    file.read(reinterpret_cast<char*>(data), static_cast<std::streamsize>(size));
 }
 
 
@@ -87,18 +85,18 @@ bool Database::writeDate(const Date& date) {
     int month = date.getMonth();
     int year = date.getYear();
 
-    if (!writeBytes(&day, sizeof(day)))   return false;
-    if (!writeBytes(&month, sizeof(month))) return false;
-    if (!writeBytes(&year, sizeof(year)))  return false;
+    if (!writeBytes(reinterpret_cast<const std::byte*>(&day), sizeof(day)))   return false;
+    if (!writeBytes(reinterpret_cast<const std::byte*>(&month), sizeof(month))) return false;
+    if (!writeBytes(reinterpret_cast<const std::byte*>(&year), sizeof(year)))  return false;
     return true;
 }
 
 bool Database::writeDouble(double value) {
-    return writeBytes(&value, sizeof(value));
+    return writeBytes(reinterpret_cast<const std::byte*>(&value), sizeof(value));
 }
 
 bool Database::writeSize(size_t value) {
-    return writeBytes(&value, sizeof(value));
+    return writeBytes(reinterpret_cast<const std::byte*>(&value), sizeof(value));
 }
 
 std::string Database::readString() {
@@ -113,21 +111,21 @@ Date Database::readDate() {
     int month;
     int year;
 
-    readBytes(&day, sizeof(day));
-    readBytes(&month, sizeof(month));
-    readBytes(&year, sizeof(year));
+    readBytes(reinterpret_cast<std::byte*>(&day), sizeof(day));
+    readBytes(reinterpret_cast<std::byte*>(&month), sizeof(month));
+    readBytes(reinterpret_cast<std::byte*>(&year), sizeof(year));
     return Date(day, month, year);
 }
 
 double Database::readDouble() {
     double value;
-    readBytes(&value, sizeof(value));
+    readBytes(reinterpret_cast<std::byte*>(&value), sizeof(value));
     return value;
 }
 
 size_t Database::readSize() {
     size_t value;
-    readBytes(&value, sizeof(value));
+    readBytes(reinterpret_cast<std::byte*>(&value), sizeof(value));
     return value;
 }
 
@@ -148,8 +146,7 @@ bool Database::writeTransaction(const Transaction& transaction) {
         return false;
     }
 
-    if (const auto* typeBytes = reinterpret_cast<const std::byte*>(&type);
-        !file.write(reinterpret_cast<const char*>(typeBytes), sizeof(type))) {
+    if (!writeBytes(reinterpret_cast<const std::byte*>(&type), sizeof(type))) {
         return false;
     }
     if (!file.good()) return false;
