@@ -14,9 +14,15 @@ Database::Database(const std::string& filename) : filename(filename) {
     }
 }
 
-Database::~Database() {
-    std::cerr << "[DEBUG Database] Destructor called for file: " << filename << std::endl;
-    closeFile();
+Database::~Database() noexcept {
+    try {
+        std::cerr << "[DEBUG Database] Destructor called for file: " << filename << std::endl;
+        closeFile();
+    } catch (const std::exception& e) {
+        std::cerr << "[ERROR Database] Exception in destructor: " << e.what() << std::endl;
+    } catch (...) {
+        std::cerr << "[ERROR Database] Unknown exception in destructor" << std::endl;
+    }
 }
 
 bool Database::openFile() {

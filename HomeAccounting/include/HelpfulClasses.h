@@ -15,7 +15,7 @@ private:
 public:
     Date();
     Date(int day, int month, int year);
-    ~Date();
+    ~Date() = default;
 
     int getDay() const;
     int getMonth() const;

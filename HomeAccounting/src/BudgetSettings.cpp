@@ -14,6 +14,34 @@ BudgetSettings::~BudgetSettings() {
     delete settings;
 }
 
+BudgetSettings::BudgetSettings(const BudgetSettings& other) {
+    (void)other;
+    settings = new QSettings(ORGANIZATION_NAME, APPLICATION_NAME);
+}
+
+BudgetSettings& BudgetSettings::operator=(const BudgetSettings& other) {
+    if (this != &other) {
+        (void)other;
+        delete settings;
+        settings = new QSettings(ORGANIZATION_NAME, APPLICATION_NAME);
+    }
+    return *this;
+}
+
+BudgetSettings::BudgetSettings(BudgetSettings&& other) noexcept {
+    settings = other.settings;
+    other.settings = nullptr;
+}
+
+BudgetSettings& BudgetSettings::operator=(BudgetSettings&& other) noexcept {
+    if (this != &other) {
+        delete settings;
+        settings = other.settings;
+        other.settings = nullptr;
+    }
+    return *this;
+}
+
 double BudgetSettings::getMonthlySalary() const {
     return settings->value(SALARY_KEY, 0.0).toDouble();
 }

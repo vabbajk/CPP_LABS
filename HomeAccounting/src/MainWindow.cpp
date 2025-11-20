@@ -25,15 +25,13 @@
 #include <vector>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), transactionList("homeaccounting.dat") {
+    : QMainWindow(parent), budgetSettings(new BudgetSettings()) {
     
     setWindowTitle(QString::fromUtf8("Домашняя бухгалтерия"));
     setMinimumSize(1100, 600);
     resize(1300, 650);
     
 
-    budgetSettings = new BudgetSettings();
-    
     setupUI();
     createMenuBar();
     connectSignals();
@@ -50,21 +48,27 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 void MainWindow::applyFiltersAndUpdateTable() {
-    // Сбор критериев фильтрации из UI через FiltersPanel
+
     FilterCriteria criteria = filtersPanel->currentCriteria();
 
     auto all = transactionList.getAllTransactions();
     std::vector<std::shared_ptr<Transaction>> ordered = TransactionFilter::filterAndSort(all, criteria);
 
-    // Пересчёт баланса по отфильтрованному набору
+    updateBalanceFor(ordered);
+    rebuildTransactionTable(ordered);
+}
+
+void MainWindow::updateBalanceFor(const std::vector<std::shared_ptr<Transaction>>& ordered) {
     double total = 0.0;
     for (const auto& t : ordered) {
-        if (t->getType()) total += t->getAmount();
-        else total -= t->getAmount();
+        if (t->getType()) {
+            total += t->getAmount();
+        } else {
+            total -= t->getAmount();
+        }
     }
     QString balanceText = QString::fromUtf8("Баланс: %1 руб.").arg(total, 0, 'f', 2);
     balanceLabel->setText(balanceText);
-    
 
     QString balanceColor = total >= 0 ? "#57f287" : "#ff7b72";
     balanceLabel->setStyleSheet(QString(
@@ -78,6 +82,9 @@ void MainWindow::applyFiltersAndUpdateTable() {
         "  border-left: 4px solid #388bfd; "
         "}"
     ).arg(balanceColor));
+}
+
+void MainWindow::rebuildTransactionTable(const std::vector<std::shared_ptr<Transaction>>& ordered) {
     transactionTable->setRowCount(0);
     int row = 0;
     for (const auto& transaction : ordered) {
@@ -168,29 +175,7 @@ void MainWindow::applyFiltersAndUpdateTable() {
         editRowButton->setProperty("transactionId", QVariant::fromValue<qulonglong>(transaction->getID()));
         actionLayout->addWidget(editRowButton);
         transactionTable->setCellWidget(row, 8, actionWidget);
-        connect(editRowButton, &QPushButton::clicked, this, [this, editRowButton]() {
-            size_t id = static_cast<size_t>(editRowButton->property("transactionId").toULongLong());
-            auto transactionsLocal = transactionList.getAllTransactions();
-            for (const auto& trans : transactionsLocal) {
-                if (trans->getID() == id) {
-                    EditTransactionDialog dialog(trans, this);
-                    if (dialog.exec() == QDialog::Accepted) {
-                        if (dialog.isDeleteRequested()) {
-                            deleteTransactionById(id);
-                        } else {
-                            auto updatedTransaction = dialog.getUpdatedTransaction();
-                            transactionList.updateTransaction(id, updatedTransaction);
-                            transactionList.saveToDatabase();
-                            applyFiltersAndUpdateTable();
-                            checkBudgetLimit();
-                            updateSavingsRadar();
-                            updateSavingsCounter();
-                        }
-                    }
-                    break;
-                }
-            }
-        });
+        connect(editRowButton, &QPushButton::clicked, this, &MainWindow::handleEditButtonClick);
         row++;
     }
 
@@ -228,6 +213,31 @@ void MainWindow::applyFiltersAndUpdateTable() {
 
 
     transactionTable->horizontalHeader()->setStretchLastSection(true);
+}
+
+void MainWindow::handleEditButtonClick() {
+    QPushButton* button = qobject_cast<QPushButton*>(sender());
+    size_t id = static_cast<size_t>(button->property("transactionId").toULongLong());
+    auto transactionsLocal = transactionList.getAllTransactions();
+    for (const auto& trans : transactionsLocal) {
+        if (trans->getID() == id) {
+            EditTransactionDialog dialog(trans, this);
+            if (dialog.exec() == QDialog::Accepted) {
+                if (dialog.isDeleteRequested()) {
+                    deleteTransactionById(id);
+                } else {
+                    auto updatedTransaction = dialog.getUpdatedTransaction();
+                    transactionList.updateTransaction(id, updatedTransaction);
+                    transactionList.saveToDatabase();
+                    applyFiltersAndUpdateTable();
+                    checkBudgetLimit();
+                    updateSavingsRadar();
+                    updateSavingsCounter();
+                }
+            }
+            break;
+        }
+    }
 }
 
 MainWindow::~MainWindow() {
@@ -319,7 +329,7 @@ void MainWindow::setupUI() {
     counterLayout->setContentsMargins(16, 16, 16, 16);
     counterLayout->setSpacing(10);
     
-    QLabel* counterTitleLabel = new QLabel(QString::fromUtf8("💰 Счетчик накоплений"), savingsCounterCard);
+    QLabel* counterTitleLabel = new QLabel(QString::fromUtf8("Счетчик накоплений"), savingsCounterCard);
     QFont counterTitleFont = counterTitleLabel->font();
     counterTitleFont.setPointSize(12);
     counterTitleFont.setBold(true);
@@ -466,9 +476,9 @@ void MainWindow::connectSignals() {
 
 void MainWindow::applyTheme(bool dark) {
 
-    qApp->setStyle("Fusion");
+    QApplication::setStyle("Fusion");
     QFont font("Segoe UI", 10);
-    qApp->setFont(font);
+    QApplication::setFont(font);
 
     const QString lightQss = R"(
         QWidget { font-family: 'Segoe UI'; font-size: 10pt; }

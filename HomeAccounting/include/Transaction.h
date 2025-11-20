@@ -5,7 +5,7 @@
 #include "HelpfulClasses.h"
 
 class Transaction {
-    protected:
+    private:
         static size_t nextID;
         size_t id;
         std::string name;
@@ -45,7 +45,12 @@ class IncomeTransaction : public Transaction {
         std::string getIncomeSource() const;
 
         friend std::ostream& operator<<(std::ostream& os, const IncomeTransaction& it) {
-            os << ' ' << it.name << ' ' << it.category << ' ' << it.date << ' ' << it.amount << ' ' << it.incomeSource << std::endl;
+			os << ' '
+			   << it.getName() << ' '
+			   << it.getCategory() << ' '
+			   << it.getDate() << ' '
+			   << it.getAmount() << ' '
+			   << it.incomeSource << std::endl;
             return os;
         }
 };
@@ -65,7 +70,12 @@ public:
     std::string getWhere() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Expense& it) {
-        os << ' ' << it.name << ' ' << it.category << ' ' << it.date << ' ' << it.amount << ' ' << it.where << std::endl;
+		os << ' '
+		   << it.getName() << ' '
+		   << it.getCategory() << ' '
+		   << it.getDate() << ' '
+		   << it.getAmount() << ' '
+		   << it.where << std::endl;
         return os;
     }
 };

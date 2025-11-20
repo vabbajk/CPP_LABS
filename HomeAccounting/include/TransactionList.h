@@ -13,7 +13,7 @@ private:
 
 public:
     TransactionList();
-    TransactionList(const std::string& dbFilename);
+    explicit TransactionList(const std::string& dbFilename);
     ~TransactionList() = default;
 
 
@@ -65,7 +65,7 @@ public:
     }
 
     void removeByName(const std::string& name) {
-        transactions.remove_if([&](const std::shared_ptr<Transaction>& t) {
+        transactions.remove_if([name](const std::shared_ptr<Transaction>& t) {
             return t->getName() == name;
         });
     }

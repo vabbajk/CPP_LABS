@@ -15,6 +15,7 @@
 #include <QProgressBar>
 #include "StatsDialog.h"
 #include <memory>
+#include <vector>
 #include "TransactionList.h"
 #include <QAction>
 #include "BudgetSettings.h"
@@ -27,7 +28,7 @@ class MainWindow : public QMainWindow {
 
 private:
 
-    TransactionList transactionList;
+    TransactionList transactionList{"homeaccounting.dat"};
     
 
     QWidget* centralWidget;
@@ -53,7 +54,9 @@ private:
     void updateTable();
     void updateBalance();
     void applyFiltersAndUpdateTable();
-    void updateBalanceFor(const std::list<std::shared_ptr<Transaction>>& list);
+    void updateBalanceFor(const std::vector<std::shared_ptr<Transaction>>& list);
+    void rebuildTransactionTable(const std::vector<std::shared_ptr<Transaction>>& ordered);
+    void handleEditButtonClick();
     void deleteTransactionById(size_t id);
     void deleteSelectedRow();
     void editTransactionById(size_t id);

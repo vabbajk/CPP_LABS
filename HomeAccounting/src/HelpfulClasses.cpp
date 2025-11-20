@@ -16,8 +16,6 @@ Date::Date(){
 
 Date::Date(int day, int month, int year) : day(day), month(month), year(year) {}
 
-Date::~Date(){}
-
 int Date::getDay() const {
     return day;
 }

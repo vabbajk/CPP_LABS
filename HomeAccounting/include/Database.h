@@ -33,8 +33,8 @@ private:
     void seekToBeginning();
     
 public:
-    Database(const std::string& filename);
-    ~Database();
+    explicit Database(const std::string& filename);
+    ~Database() noexcept;
     
 
     bool saveTransactionList(const TransactionList& transactionList);

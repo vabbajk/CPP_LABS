@@ -11,11 +11,13 @@ class TransactionQueries {
 public:
     static double currentMonthExpenses(const std::list<std::shared_ptr<Transaction>>& transactions) {
         std::time_t now = std::time(nullptr);
-        std::tm* timeinfo = std::localtime(&now);
-        int currentYear = timeinfo->tm_year + 1900;
-        int currentMonth = timeinfo->tm_mon + 1;
+        std::tm timeinfo{};
+        localtime_s(&timeinfo, &now);
 
-        auto predicate = [&](const std::shared_ptr<Transaction>& transaction) {
+        int currentYear = timeinfo.tm_year + 1900;
+        int currentMonth = timeinfo.tm_mon + 1;
+
+        auto predicate = [currentYear, currentMonth](const std::shared_ptr<Transaction>& transaction) {
             if (transaction->getType() != 0) return false;
             const Date& transDate = transaction->getDate();
             return transDate.getYear() == currentYear &&
@@ -34,15 +36,17 @@ public:
 
     static double currentMonthIncome(const std::list<std::shared_ptr<Transaction>>& transactions) {
         std::time_t now = std::time(nullptr);
-        std::tm* timeinfo = std::localtime(&now);
-        int currentYear = timeinfo->tm_year + 1900;
-        int currentMonth = timeinfo->tm_mon + 1;
-        int currentDay = timeinfo->tm_mday;
+        std::tm timeinfo{};
+        localtime_s(&timeinfo, &now);
+
+        int currentYear = timeinfo.tm_year + 1900;
+        int currentMonth = timeinfo.tm_mon + 1;
+        int currentDay = timeinfo.tm_mday;
 
         Date monthStart(1, currentMonth, currentYear);
         Date today(currentDay, currentMonth, currentYear);
 
-        auto predicate = [&](const std::shared_ptr<Transaction>& transaction) {
+        auto predicate = [currentYear, currentMonth, monthStart, today](const std::shared_ptr<Transaction>& transaction) {
             if (transaction->getType() != 1) return false;
             Date transDate = transaction->getDate();
             return transDate.getYear() == currentYear &&

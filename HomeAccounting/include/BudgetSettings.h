@@ -16,6 +16,14 @@ public:
     BudgetSettings();
     ~BudgetSettings();
 
+    // Копирование создаёт собственный QSettings с теми же параметрами
+    BudgetSettings(const BudgetSettings& other);
+    BudgetSettings& operator=(const BudgetSettings& other);
+
+    // Перемещение передаёт владение указателем settings
+    BudgetSettings(BudgetSettings&& other) noexcept;
+    BudgetSettings& operator=(BudgetSettings&& other) noexcept;
+
 
     double getMonthlySalary() const;
     void setMonthlySalary(double salary);
