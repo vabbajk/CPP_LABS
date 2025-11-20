@@ -12,6 +12,7 @@
 #include "TransactionList.h"
 
 #include <algorithm>
+#include <ranges>
 
 class PieChartWidget : public QWidget {
     Q_OBJECT
@@ -76,7 +77,7 @@ protected:
         int startAngle = 0;
         QList<QPair<QString,double>> items;
         for (auto it = data.constBegin(); it != data.constEnd(); ++it) items.append({it.key(), it.value()});
-        std::sort(items.begin(), items.end(), [](const auto& a, const auto& b){ return a.second > b.second; });
+        std::ranges::sort(items, [](const auto& a, const auto& b){ return a.second > b.second; });
 
         for (const auto& [category, value] : items) {
             auto span = static_cast<int>((value / total) * 360.0 * 16);
