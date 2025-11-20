@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupUI();
     createMenuBar();
     connectSignals();
-    
+
     transactionList.loadFromDatabase();
     applyFiltersAndUpdateTable();
     budgetManager->checkBudgetLimit();
@@ -104,8 +104,8 @@ void MainWindow::setupUI() {
     auto* mainLayout = new QVBoxLayout(centralWidget);
     mainLayout->setContentsMargins(12, 12, 12, 12);
     mainLayout->setSpacing(12);
-
     
+
     auto* topLayout = new QHBoxLayout();
     balanceLabel = new QLabel(QString::fromUtf8("Баланс: 0.00 руб."), this);
     balanceLabel->setObjectName("balanceLabel");
@@ -218,7 +218,7 @@ void MainWindow::setupUI() {
     connect(tableManager, &TransactionTableManager::deleteRequested, this, &MainWindow::onDeleteRequested);
     
     leftLayout->addWidget(transactionTable);
-        
+    
     auto* buttonLayout = new QHBoxLayout();
     buttonLayout->setSpacing(12);
     
@@ -704,13 +704,13 @@ void MainWindow::onEditTransaction() {
     
     const auto* idItem = transactionTable->item(currentRow, 1);
     if (!idItem) return;
-    size_t id = idItem->text().toULongLong();
+        size_t id = idItem->text().toULongLong();
     onEditRequested(id);
 }
 
 void MainWindow::onHeaderClicked(int logicalIndex) {
     tableManager->handleHeaderClick(logicalIndex, transactionList, currentSortColumn, dateSortAscending, amountSortAscending);
-    applyFiltersAndUpdateTable();
+        applyFiltersAndUpdateTable();
 }
 
 void MainWindow::onExportTxt() {
@@ -781,9 +781,9 @@ void MainWindow::onEditRequested(size_t transactionId) {
 
     auto updatedTransaction = dialog.getUpdatedTransaction(transactionId);
     transactionList.updateTransaction(transactionId, updatedTransaction);
-    transactionList.saveToDatabase();
-    applyFiltersAndUpdateTable();
-}
+                        transactionList.saveToDatabase();
+                        applyFiltersAndUpdateTable();
+                    }
 
 void MainWindow::onDeleteRequested(size_t transactionId) {
     deleteTransactionById(transactionId);
