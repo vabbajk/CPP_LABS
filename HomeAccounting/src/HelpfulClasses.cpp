@@ -6,12 +6,12 @@
 #include <iomanip>
 
 Date::Date(){
-    time_t now = time(nullptr);
-    tm* local = localtime(&now);
+    std::time_t now = std::time(nullptr);
+    std::tm local_tm{};
 
-    day = local->tm_mday;
-    month = local->tm_mon + 1;
-    year = local->tm_year + 1900;
+    day = local_tm.tm_mday;
+    month = local_tm.tm_mon + 1;
+    year = local_tm.tm_year + 1900;
 }
 
 Date::Date(int day, int month, int year) : day(day), month(month), year(year) {}

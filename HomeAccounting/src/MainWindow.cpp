@@ -1194,8 +1194,8 @@ void MainWindow::updateBalance() {
 
 }
 
-void MainWindow::onAddIncome() {
-    AddTransactionDialog dialog(true, this);
+void MainWindow::addTransaction(bool isIncome) {
+    AddTransactionDialog dialog(isIncome, this);
     if (dialog.exec() == QDialog::Accepted) {
         auto transaction = dialog.getTransaction();
         transactionList.addTransaction(transaction);
@@ -1207,17 +1207,12 @@ void MainWindow::onAddIncome() {
     }
 }
 
+void MainWindow::onAddIncome() {
+    addTransaction(true);
+}
+
 void MainWindow::onAddExpense() {
-    AddTransactionDialog dialog(false, this);
-    if (dialog.exec() == QDialog::Accepted) {
-        auto transaction = dialog.getTransaction();
-        transactionList.addTransaction(transaction);
-        transactionList.saveToDatabase();
-        applyFiltersAndUpdateTable();
-        checkBudgetLimit();
-        updateSavingsRadar();
-        updateSavingsCounter();
-    }
+    addTransaction(false);
 }
 
 void MainWindow::onEditTransaction() {
@@ -1523,6 +1518,8 @@ void MainWindow::updateSavingsRadar() {
     double currentIncome = transactionList.getCurrentMonthIncome();
     double currentExpenses = transactionList.getCurrentMonthExpenses();
     double actualSavings = currentIncome - currentExpenses;
+    double totalBalance = transactionList.getTotalBalance();
+    double effectiveSavings = std::min(actualSavings, totalBalance);
 
     if (plannedSavings <= 0.0) {
         savingsProgressBar->setValue(0);
@@ -1530,43 +1527,44 @@ void MainWindow::updateSavingsRadar() {
         savingsForecastLabel->setText(QString::fromUtf8("Переход: Настройки → Настройка бюджета..."));
         return;
     }
-
-    double progress = (plannedSavings > 0.0) ? (actualSavings / plannedSavings) * 100.0 : 0.0;
+    
+    double cappedSavings = std::clamp(effectiveSavings, 0.0, plannedSavings);
+    double progress = (plannedSavings > 0.0) ? (cappedSavings / plannedSavings) * 100.0 : 0.0;
     int progressValue = static_cast<int>(std::round(std::clamp(progress, 0.0, 200.0)));
     savingsProgressBar->setValue(std::min(progressValue, 100));
 
     QString color = "#4caf50";
     QString statusText;
 
-    if (actualSavings >= plannedSavings) {
+    if (effectiveSavings >= plannedSavings) {
         color = "#2ecc71";
         statusText = QString::fromUtf8("🎉 <span style='color:%1;'>Цель достигнута!</span> Накоплено <b>%2 руб.</b> из %3 руб.")
             .arg(color)
-            .arg(actualSavings, 0, 'f', 2)
+            .arg(cappedSavings, 0, 'f', 2)
             .arg(plannedSavings, 0, 'f', 2);
     } else if (progress >= 90.0) {
         color = "#f57c00";
         statusText = QString::fromUtf8("🔥 <span style='color:%1;'>Почти у цели!</span> Накоплено <b>%2 руб.</b> из %3 руб.")
             .arg(color)
-            .arg(actualSavings, 0, 'f', 2)
+            .arg(cappedSavings, 0, 'f', 2)
             .arg(plannedSavings, 0, 'f', 2);
     } else if (progress >= 60.0) {
         color = "#f9a825";
         statusText = QString::fromUtf8("⚡ <span style='color:%1;'>Хороший прогресс.</span> Накоплено <b>%2 руб.</b> из %3 руб.")
             .arg(color)
-            .arg(actualSavings, 0, 'f', 2)
+            .arg(cappedSavings, 0, 'f', 2)
             .arg(plannedSavings, 0, 'f', 2);
     } else if (progress >= 30.0) {
         color = "#03a9f4";
         statusText = QString::fromUtf8("🚀 <span style='color:%1;'>Вы в пути.</span> Накоплено <b>%2 руб.</b> из %3 руб.")
             .arg(color)
-            .arg(actualSavings, 0, 'f', 2)
+            .arg(cappedSavings, 0, 'f', 2)
             .arg(plannedSavings, 0, 'f', 2);
     } else if (actualSavings > 0.0) {
         color = "#7986cb";
         statusText = QString::fromUtf8("🌱 <span style='color:%1;'>Начало положено.</span> Накоплено <b>%2 руб.</b> из %3 руб.")
             .arg(color)
-            .arg(actualSavings, 0, 'f', 2)
+            .arg(cappedSavings, 0, 'f', 2)
             .arg(plannedSavings, 0, 'f', 2);
     } else {
         color = "#ef5350";
@@ -1601,20 +1599,22 @@ void MainWindow::updateSavingsRadar() {
 }
 
 void MainWindow::updateSavingsCounter() {
-    double currentMonthSavings = transactionList.getCurrentMonthNetSavings();
-    double totalSavings = transactionList.getTotalSavings();
-    
-    QString monthColor = currentMonthSavings >= 0 ? "#2ecc71" : "#ff6b6b";
-    QString totalColor = totalSavings >= 0 ? "#4caf50" : "#e74c3c";
-    
+    double totalBalance = transactionList.getTotalBalance();
+    double currentMonthExpenses = transactionList.getCurrentMonthExpenses();
+
+    double remainingAfterMonth = totalBalance - currentMonthExpenses;
+
+    QString monthColor = remainingAfterMonth >= 0 ? "#2ecc71" : "#ff6b6b";
+    QString totalColor = totalBalance >= 0 ? "#4caf50" : "#e74c3c";
+
     QString counterText = QString::fromUtf8(
-        "📅 <b>За этот месяц:</b> <span style='color:%1; font-size:13pt;'>%2 руб.</span><br>"
-        "💎 <b>Всего накоплено:</b> <span style='color:%3; font-size:13pt;'>%4 руб.</span>"
+        "📅 <b>После расходов этого месяца останется:</b> <span style='color:%1; font-size:13pt;'>%2 руб.</span><br>"
+        "💎 <b>Текущий баланс:</b> <span style='color:%3; font-size:13pt;'>%4 руб.</span>"
     )
     .arg(monthColor)
-    .arg(currentMonthSavings, 0, 'f', 2)
+    .arg(remainingAfterMonth, 0, 'f', 2)
     .arg(totalColor)
-    .arg(totalSavings, 0, 'f', 2);
-    
+    .arg(totalBalance, 0, 'f', 2);
+
     totalSavingsLabel->setText(counterText);
 }

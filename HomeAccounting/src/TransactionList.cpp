@@ -11,22 +11,16 @@ TransactionList::TransactionList(const std::string& dbFilename) : dbFilename(dbF
 }
 
 double TransactionList::getCurrentMonthExpenses() const {
-    std::time_t now = std::time(nullptr);
-    std::tm* timeinfo = std::localtime(&now);
-    int currentYear = timeinfo->tm_year + 1900;
-    int currentMonth = timeinfo->tm_mon + 1;
-    int currentDay = timeinfo->tm_mday;
-
-    Date monthStart(1, currentMonth, currentYear);
-    Date today(currentDay, currentMonth, currentYear);
+	std::time_t now = std::time(nullptr);
+	std::tm* timeinfo = std::localtime(&now);
+	int currentYear = timeinfo->tm_year + 1900;
+	int currentMonth = timeinfo->tm_mon + 1;
 
     auto predicate = [&](const std::shared_ptr<Transaction>& transaction) {
         if (transaction->getType() != 0) return false;
-        Date transDate = transaction->getDate();
+        const Date& transDate = transaction->getDate();
         return transDate.getYear() == currentYear &&
-               transDate.getMonth() == currentMonth &&
-               transDate >= monthStart &&
-               transDate <= today;
+               transDate.getMonth() == currentMonth;
     };
 
     return analytics::sum_if(

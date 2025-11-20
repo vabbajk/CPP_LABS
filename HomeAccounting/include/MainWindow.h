@@ -69,6 +69,7 @@ private:
     void updateBudgetWarning();
     void updateSavingsRadar();
     void updateSavingsCounter();
+    void addTransaction(bool isIncome);
     
 private slots:
     void onAddIncome();
