@@ -222,7 +222,7 @@ void TransactionTableManager::onTableContextMenu(const QPoint& pos) {
     }
 }
 
-void TransactionTableManager::handleHeaderClick(int logicalIndex, TransactionList& transactionList, 
+void TransactionTableManager::handleHeaderClick(int logicalIndex, TransactionList& transactionList, // NOSONAR - modifies external table_ and reference parameters
                                                  int& currentSortColumn, bool& dateSortAscending, bool& amountSortAscending) { // NOSONAR - modifies external table_ and reference parameters
     if (logicalIndex == 4) {
         currentSortColumn = 4;
