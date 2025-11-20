@@ -62,14 +62,16 @@ bool Database::isOpen() const {
 
 
 bool Database::writeBytes(const std::byte* data, std::size_t size) {
-    if (!file.write(reinterpret_cast<const char*>(data), static_cast<std::streamsize>(size))) {
+    const auto* charData = reinterpret_cast<const char*>(data);
+    if (!file.write(charData, static_cast<std::streamsize>(size))) {
         return false;
     }
     return file.good();
 }
 
 void Database::readBytes(std::byte* data, std::size_t size) {
-    file.read(reinterpret_cast<char*>(data), static_cast<std::streamsize>(size));
+    auto* charData = reinterpret_cast<char*>(data);
+    file.read(charData, static_cast<std::streamsize>(size));
 }
 
 
@@ -167,9 +169,8 @@ bool Database::writeTransaction(const Transaction& transaction) {
 }
 
 std::shared_ptr<Transaction> Database::readTransaction() {
-
     int type;
-    readBytes(&type, sizeof(type));
+    readBytes(reinterpret_cast<std::byte*>(&type), sizeof(type));
     if (!file.good()) {
         throw DatabaseReadException("Failed to read transaction type");
     }
@@ -291,7 +292,7 @@ TransactionList Database::loadTransactionList() {
 
         auto pos = file.tellg();
         int test_type;
-        readBytes(&test_type, sizeof(test_type));
+        readBytes(reinterpret_cast<std::byte*>(&test_type), sizeof(test_type));
         
         if (!file.good() || file.eof()) {
 

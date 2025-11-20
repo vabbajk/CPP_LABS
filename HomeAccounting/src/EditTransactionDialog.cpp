@@ -91,8 +91,7 @@ void EditTransactionDialog::onDeleteClicked() {
     accept();
 }
 
-std::shared_ptr<Transaction> EditTransactionDialog::getUpdatedTransaction() const {
-    size_t existingId = transaction ? transaction->getID() : 0;
+std::shared_ptr<Transaction> EditTransactionDialog::getUpdatedTransaction(size_t originalId) const {
     TransactionDialogControls controls{};
     controls.nameEdit = nameEdit;
     controls.categoryCombo = categoryCombo;
@@ -104,6 +103,6 @@ std::shared_ptr<Transaction> EditTransactionDialog::getUpdatedTransaction() cons
         isIncome,
         controls,
         /* preserveId */ true,
-        existingId
+        originalId
     );
 }

@@ -39,7 +39,7 @@ public:
     explicit EditTransactionDialog(std::shared_ptr<Transaction> trans, QWidget *parent = nullptr);
     ~EditTransactionDialog() override = default;
     
-    std::shared_ptr<Transaction> getUpdatedTransaction() const;
+    std::shared_ptr<Transaction> getUpdatedTransaction(size_t originalId) const;
     bool isDeleteRequested() const { return deleteRequested; }
 
 private slots:

@@ -5,6 +5,9 @@
 #include "../include/BudgetSettingsDialog.h"
 #include "../include/TransactionFilter.h"
 #include "../include/FiltersPanel.h"
+#include "../include/TransactionTableManager.h"
+#include "../include/BudgetManager.h"
+#include "../include/SavingsTracker.h"
 #include <QApplication>
 #include <QMenuBar>
 #include <QMenu>
@@ -31,31 +34,34 @@ MainWindow::MainWindow(QWidget *parent)
     setMinimumSize(1100, 600);
     resize(1300, 650);
     
-
+    // Initialize manager classes
+    budgetManager = new BudgetManager(budgetSettings, &transactionList, this);
+    savingsTracker = new SavingsTracker(budgetSettings, &transactionList, this);
+    
     setupUI();
     createMenuBar();
     connectSignals();
     
-
     transactionList.loadFromDatabase();
     applyFiltersAndUpdateTable();
-    checkBudgetLimit();
-    updateSavingsRadar();
-    updateSavingsCounter();
-
-
+    budgetManager->checkBudgetLimit();
+    savingsTracker->updateSavingsRadar();
+    savingsTracker->updateSavingsCounter();
+    
     applyTheme(true);
 }
 
 void MainWindow::applyFiltersAndUpdateTable() {
-
     FilterCriteria criteria = filtersPanel->currentCriteria();
 
     auto all = transactionList.getAllTransactions();
     std::vector<std::shared_ptr<Transaction>> ordered = TransactionFilter::filterAndSort(all, criteria);
 
     updateBalanceFor(ordered);
-    rebuildTransactionTable(ordered);
+    tableManager->rebuildTable(ordered);
+    budgetManager->checkBudgetLimit();
+    savingsTracker->updateSavingsRadar();
+    savingsTracker->updateSavingsCounter();
 }
 
 void MainWindow::updateBalanceFor(const std::vector<std::shared_ptr<Transaction>>& ordered) {
@@ -84,137 +90,7 @@ void MainWindow::updateBalanceFor(const std::vector<std::shared_ptr<Transaction>
     ).arg(balanceColor));
 }
 
-void MainWindow::rebuildTransactionTable(const std::vector<std::shared_ptr<Transaction>>& ordered) {
-    transactionTable->setRowCount(0);
-    int row = 0;
-    for (const auto& transaction : ordered) {
-        transactionTable->insertRow(row);
-        auto* iconItem = new QTableWidgetItem();
-        if (transaction->getType() == 1) {
-            iconItem->setText("+");
-            iconItem->setForeground(QBrush(QColor("#2ecc71")));
-        } else {
-            iconItem->setText("-");
-            iconItem->setForeground(QBrush(QColor("#ff6b6b")));
-        }
-        QFont iconFont = iconItem->font();
-        iconFont.setPointSize(iconFont.pointSize() + 6);
-        iconFont.setBold(true);
-        iconItem->setFont(iconFont);
-        iconItem->setTextAlignment(Qt::AlignCenter);
-        iconItem->setData(Qt::BackgroundRole, QColor(0, 0, 0, 0));
-        transactionTable->setItem(row, 0, iconItem);
-        auto* idItem = new QTableWidgetItem(QString::number(transaction->getID()));
-        idItem->setTextAlignment(Qt::AlignCenter);
-        transactionTable->setItem(row, 1, idItem);
-        
 
-        transactionTable->setItem(row, 2, new QTableWidgetItem(QString::fromUtf8(transaction->getName().c_str())));
-        
-
-        transactionTable->setItem(row, 3, new QTableWidgetItem(QString::fromUtf8(transaction->getCategory().c_str())));
-                auto* dateItem = new QTableWidgetItem(QString::fromStdString(transaction->getDate().getDate()));
-        dateItem->setTextAlignment(Qt::AlignCenter);
-        transactionTable->setItem(row, 4, dateItem);
-        
-        auto* amountItem = new QTableWidgetItem(QString::number(transaction->getAmount(), 'f', 2));
-        amountItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        transactionTable->setItem(row, 5, amountItem);
-
-        QString type;
-        QString additionalInfo;
-        if (transaction->getType() == 1) {
-            type = QString::fromUtf8("Доход");
-            auto income = std::dynamic_pointer_cast<IncomeTransaction>(transaction);
-            if (income) additionalInfo = QString::fromUtf8(income->getIncomeSource().c_str());
-        } else {
-            type = QString::fromUtf8("Расход");
-            auto expense = std::dynamic_pointer_cast<Expense>(transaction);
-            if (expense) additionalInfo = QString::fromUtf8(expense->getWhere().c_str());
-        }
-        
-
-        auto* typeItem = new QTableWidgetItem(type);
-        typeItem->setTextAlignment(Qt::AlignCenter);
-        transactionTable->setItem(row, 6, typeItem);
-        
-
-        transactionTable->setItem(row, 7, new QTableWidgetItem(additionalInfo));
-        auto* actionWidget = new QWidget(this);
-        auto* actionLayout = new QHBoxLayout(actionWidget);
-        actionLayout->setContentsMargins(8, 2, 8, 2);
-        actionLayout->setSpacing(0);
-        actionLayout->setAlignment(Qt::AlignCenter);
-        
-        auto* editRowButton = new QPushButton(QString::fromUtf8("Редакт."), actionWidget);
-        editRowButton->setFixedSize(85, 28);
-        editRowButton->setToolTip(QString::fromUtf8("Редактировать транзакцию"));
-        editRowButton->setStyleSheet(
-            "QPushButton {"
-            "  background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #1f6feb, stop:1 #388bfd);"
-            "  color: #ffffff;"
-            "  border: none;"
-            "  border-radius: 7px;"
-            "  font-size: 9pt;"
-            "  font-weight: 700;"
-            "  padding: 4px 8px;"
-            "}"
-            "QPushButton:hover {"
-            "  background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #388bfd, stop:1 #58a6ff);"
-            "  box-shadow: 0 2px 8px rgba(56, 139, 253, 0.4);"
-            "}"
-            "QPushButton:pressed { background: #0969da; }"
-        );
-        editRowButton->setCursor(Qt::PointingHandCursor);
-        editRowButton->setProperty("transactionId", QVariant::fromValue<qulonglong>(transaction->getID()));
-        actionLayout->addWidget(editRowButton);
-        transactionTable->setCellWidget(row, 8, actionWidget);
-        connect(editRowButton, &QPushButton::clicked, this, &MainWindow::handleEditButtonClick);
-        row++;
-    }
-
-    transactionTable->setColumnWidth(0, 48);
-    transactionTable->setColumnWidth(1, 60);
-    transactionTable->setColumnWidth(2, 150);
-    transactionTable->setColumnWidth(3, 130);
-    transactionTable->setColumnWidth(4, 100);
-    transactionTable->setColumnWidth(5, 90);
-    transactionTable->setColumnWidth(6, 80);
-    transactionTable->setColumnWidth(7, 120);
-    transactionTable->setColumnWidth(8, 100);
-
-    transactionTable->setStyleSheet(
-    "QTableWidget {"
-    "  background-color: #0d1117;"
-    "  color: #e6edf3;"
-    "  gridline-color: #30363d;"
-    "  border: 1px solid #21262d;"
-    "  border-radius: 8px;"
-    "}"
-    "QHeaderView::section {"
-    "  background-color: #161b22;"
-    "  color: #c9d1d9;"
-    "  font-weight: 600;"
-    "  border: none;"
-    "  padding: 6px;"
-    "}"
-    "QTableCornerButton::section { background: #161b22; border: none; }"
-);
-
-
-
-    transactionTable->verticalHeader()->setDefaultSectionSize(52);
-
-
-    transactionTable->horizontalHeader()->setStretchLastSection(true);
-}
-
-void MainWindow::handleEditButtonClick() {
-    const auto* button = qobject_cast<const QPushButton*>(sender());
-    if (!button) return;
-    auto id = button->property("transactionId").toULongLong();
-    editTransactionById(id);
-}
 
 MainWindow::~MainWindow() {
     delete budgetSettings;
@@ -240,7 +116,7 @@ void MainWindow::setupUI() {
     topLayout->addWidget(balanceLabel);
     
 
-    budgetInfoLabel = new QLabel(this);
+    QLabel* budgetInfoLabel = new QLabel(this);
     budgetInfoLabel->setTextFormat(Qt::RichText);
     QFont budgetFont = budgetInfoLabel->font();
     budgetFont.setPointSize(10);
@@ -249,13 +125,15 @@ void MainWindow::setupUI() {
     topLayout->addWidget(budgetInfoLabel, 1);
     
 
-    budgetWarningLabel = new QLabel(this);
+    QLabel* budgetWarningLabel = new QLabel(this);
     budgetWarningLabel->setVisible(false);
     budgetWarningLabel->setWordWrap(true);
     budgetWarningLabel->setTextFormat(Qt::RichText);
     QFont warningFont = budgetWarningLabel->font();
     warningFont.setPointSize(10);
     budgetWarningLabel->setFont(warningFont);
+    
+    budgetManager->setLabels(budgetInfoLabel, budgetWarningLabel);
     
     mainLayout->addLayout(topLayout);
     
@@ -277,17 +155,17 @@ void MainWindow::setupUI() {
     savingsTitleLabel->setFont(savingsTitleFont);
     savingsLayout->addWidget(savingsTitleLabel);
 
-    savingsStatusLabel = new QLabel(savingsCard);
+    QLabel* savingsStatusLabel = new QLabel(savingsCard);
     savingsStatusLabel->setTextFormat(Qt::RichText);
     savingsLayout->addWidget(savingsStatusLabel);
 
-    savingsProgressBar = new QProgressBar(savingsCard);
+    QProgressBar* savingsProgressBar = new QProgressBar(savingsCard);
     savingsProgressBar->setRange(0, 100);
     savingsProgressBar->setTextVisible(false);
     savingsProgressBar->setFixedHeight(14);
     savingsLayout->addWidget(savingsProgressBar);
 
-    savingsForecastLabel = new QLabel(savingsCard);
+    QLabel* savingsForecastLabel = new QLabel(savingsCard);
     savingsForecastLabel->setTextFormat(Qt::RichText);
     QFont forecastFont = savingsForecastLabel->font();
     forecastFont.setPointSize(9);
@@ -310,12 +188,14 @@ void MainWindow::setupUI() {
     counterTitleLabel->setFont(counterTitleFont);
     counterLayout->addWidget(counterTitleLabel);
     
-    totalSavingsLabel = new QLabel(savingsCounterCard);
+    QLabel* totalSavingsLabel = new QLabel(savingsCounterCard);
     totalSavingsLabel->setTextFormat(Qt::RichText);
     QFont totalSavingsFont = totalSavingsLabel->font();
     totalSavingsFont.setPointSize(11);
     totalSavingsLabel->setFont(totalSavingsFont);
     counterLayout->addWidget(totalSavingsLabel);
+    
+    savingsTracker->setWidgets(savingsProgressBar, savingsStatusLabel, savingsForecastLabel, totalSavingsLabel);
     
     mainLayout->addWidget(savingsCounterCard);
     
@@ -333,41 +213,9 @@ void MainWindow::setupUI() {
     
 
     transactionTable = new QTableWidget(this);
-    transactionTable->setColumnCount(9);
-    
-    QStringList headers;
-    headers << "" << "ID" << QString::fromUtf8("Название") << QString::fromUtf8("Категория") 
-            << QString::fromUtf8("Дата") << QString::fromUtf8("Сумма") 
-            << QString::fromUtf8("Тип") << QString::fromUtf8("Доп. инфо") << QString::fromUtf8("Действия");
-    transactionTable->setHorizontalHeaderLabels(headers);
-    
-
-    transactionTable->setCornerButtonEnabled(false);
-    transactionTable->verticalHeader()->setVisible(false);
-    
-
-    transactionTable->horizontalHeader()->setStretchLastSection(false);
-    transactionTable->horizontalHeader()->setSortIndicatorShown(true);
-    transactionTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    
-
-    transactionTable->setColumnWidth(0, 30);
-    transactionTable->setColumnWidth(1, 60);
-    transactionTable->setColumnWidth(2, 150);
-    transactionTable->setColumnWidth(3, 130);
-    transactionTable->setColumnWidth(4, 100);
-    transactionTable->setColumnWidth(5, 90);
-    transactionTable->setColumnWidth(6, 80);
-    transactionTable->setColumnWidth(7, 120);
-    transactionTable->setColumnWidth(8, 100);
-    
-
-    transactionTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    transactionTable->setSelectionMode(QAbstractItemView::SingleSelection);
-    transactionTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    transactionTable->setAlternatingRowColors(true);
-    transactionTable->setShowGrid(false);
-    transactionTable->verticalHeader()->setDefaultSectionSize(36);
+    tableManager = new TransactionTableManager(transactionTable, this);
+    connect(tableManager, &TransactionTableManager::editRequested, this, &MainWindow::onEditRequested);
+    connect(tableManager, &TransactionTableManager::deleteRequested, this, &MainWindow::onDeleteRequested);
     
     leftLayout->addWidget(transactionTable);
         
@@ -439,10 +287,6 @@ void MainWindow::connectSignals() {
         StatsDialog dlg(&transactionList, this);
         dlg.exec();
     });
-    connect(transactionTable, &QTableWidget::cellDoubleClicked, this, &MainWindow::onTableDoubleClicked);
-    transactionTable->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(transactionTable, &QWidget::customContextMenuRequested, this, &MainWindow::onTableContextMenu);
-    transactionTable->setColumnWidth(0, 30);
 }
 
 void MainWindow::applyTheme(bool dark) const {
@@ -830,154 +674,7 @@ void MainWindow::applyTheme(bool dark) const {
     qApp->setStyleSheet(dark ? darkQss : lightQss);
 }
 
-void MainWindow::updateTable() {
-    transactionTable->setRowCount(0);
 
-    auto transactions = transactionList.getAllTransactions();
-    int row = 0;
-
-    for (const auto& transaction : transactions) {
-        transactionTable->insertRow(row);
-
-
-        auto* iconItem = new QTableWidgetItem();
-        if (transaction->getType() == 1) {
-            iconItem->setText("+");
-            iconItem->setForeground(QBrush(Qt::green));
-        } else {
-            iconItem->setText("-");
-            iconItem->setForeground(QBrush(Qt::red));
-        }
-        iconItem->setTextAlignment(Qt::AlignCenter);
-        transactionTable->setItem(row, 0, iconItem);
-        auto* idItem = new QTableWidgetItem(QString::number(transaction->getID()));
-        idItem->setTextAlignment(Qt::AlignCenter);
-        transactionTable->setItem(row, 1, idItem);
-
-
-        transactionTable->setItem(row, 2, new QTableWidgetItem(QString::fromUtf8(transaction->getName().c_str())));
-
-
-        transactionTable->setItem(row, 3, new QTableWidgetItem(QString::fromUtf8(transaction->getCategory().c_str())));
-        auto* dateItem = new QTableWidgetItem(QString::fromStdString(transaction->getDate().getDate()));
-        dateItem->setTextAlignment(Qt::AlignCenter);
-        transactionTable->setItem(row, 4, dateItem);
-        auto* amountItem = new QTableWidgetItem(QString::number(transaction->getAmount(), 'f', 2));
-        amountItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        transactionTable->setItem(row, 5, amountItem);
-
-
-        QString type;
-        QString additionalInfo;
-
-        if (transaction->getType() == 1) {
-            type = QString::fromUtf8("Доход");
-            auto income = std::dynamic_pointer_cast<IncomeTransaction>(transaction);
-            if (income)
-                additionalInfo = QString::fromUtf8(income->getIncomeSource().c_str());
-        } else {
-            type = QString::fromUtf8("Расход");
-            auto expense = std::dynamic_pointer_cast<Expense>(transaction);
-            if (expense)
-                additionalInfo = QString::fromUtf8(expense->getWhere().c_str());
-        }
-
-        auto* typeItem = new QTableWidgetItem(type);
-        typeItem->setTextAlignment(Qt::AlignCenter);
-        transactionTable->setItem(row, 6, typeItem);
-
-        transactionTable->setItem(row, 7, new QTableWidgetItem(additionalInfo));
-        
-        auto* actionWidget = new QWidget(this);
-        auto* actionLayout = new QHBoxLayout(actionWidget);
-        actionLayout->setContentsMargins(4, 0, 4, 0);
-        actionLayout->setSpacing(0);
-        actionLayout->setAlignment(Qt::AlignCenter);
-
-
-        actionWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);        
-        auto* editRowButton = new QPushButton(QString::fromUtf8("Редакт."), actionWidget);
-        editRowButton->setFixedHeight(30);
-        editRowButton->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-        editRowButton->setCursor(Qt::PointingHandCursor);
-        editRowButton->setToolTip(QString::fromUtf8("Редактировать транзакцию"));
-
-
-        editRowButton->setStyleSheet(
-            "QPushButton {"
-            "  background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #1f6feb, stop:1 #388bfd);"
-            "  color: #ffffff;"
-            "  border: none;"
-            "  border-radius: 7px;"
-            "  font-size: 9pt;"
-            "  font-weight: 700;"
-            "  padding: 4px 10px;"
-            "}"
-            "QPushButton:hover {"
-            "  background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #388bfd, stop:1 #58a6ff);"
-            "}"
-            "QPushButton:pressed { background: #0969da; }"
-        );
-
-        editRowButton->setProperty("transactionId", QVariant::fromValue<qulonglong>(transaction->getID()));
-
-        actionLayout->addWidget(editRowButton);
-        transactionTable->setCellWidget(row, 8, actionWidget);
-
-
-        connect(editRowButton, &QPushButton::clicked, this, [this, editRowButton]() {
-            auto id = editRowButton->property("transactionId").toULongLong();
-            editTransactionById(id);
-        });
-
-        row++;
-    }
-
-
-    transactionTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-    transactionTable->horizontalHeader()->setStretchLastSection(false);
-
-    transactionTable->setColumnWidth(0, 30);
-    transactionTable->setColumnWidth(1, 60);
-    transactionTable->setColumnWidth(2, 150);
-    transactionTable->setColumnWidth(3, 130);
-    transactionTable->setColumnWidth(4, 100);
-    transactionTable->setColumnWidth(5, 90);
-    transactionTable->setColumnWidth(6, 80);
-    transactionTable->setColumnWidth(7, 120);
-    transactionTable->setColumnWidth(8, 130);
-
-
-    transactionTable->verticalHeader()->setDefaultSectionSize(44);
-
-
-    transactionTable->setContentsMargins(0, 0, 0, 0);
-    transactionTable->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-}
-
-
-void MainWindow::updateBalance() {
-    double balance = transactionList.getTotalBalance();
-    QString balanceText = QString::fromUtf8("Баланс: %1 руб.").arg(balance, 0, 'f', 2);
-    balanceLabel->setText(balanceText);
-    
-
-    QString balanceColor = balance >= 0 ? "#57f287" : "#ff7b72";
-    balanceLabel->setStyleSheet(QString(
-        "QLabel#balanceLabel { "
-        "  color: %1; "
-        "  font-size: 16pt; "
-        "  font-weight: 700; "
-        "  padding: 8px 12px; "
-        "  background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgba(56, 139, 253, 0.1), stop:1 rgba(56, 139, 253, 0.05)); "
-        "  border-radius: 12px; "
-        "  border-left: 4px solid #388bfd; "
-        "}"
-    ).arg(balanceColor));
-
-    balanceLabel->setObjectName("balanceLabel");
-
-}
 
 void MainWindow::addTransaction(bool isIncome) {
     AddTransactionDialog dialog(isIncome, this);
@@ -986,9 +683,6 @@ void MainWindow::addTransaction(bool isIncome) {
         transactionList.addTransaction(transaction);
         transactionList.saveToDatabase();
         applyFiltersAndUpdateTable();
-        checkBudgetLimit();
-        updateSavingsRadar();
-        updateSavingsCounter();
     }
 }
 
@@ -1011,38 +705,12 @@ void MainWindow::onEditTransaction() {
     const auto* idItem = transactionTable->item(currentRow, 1);
     if (!idItem) return;
     size_t id = idItem->text().toULongLong();
-    editTransactionById(id);
-}
-
-void MainWindow::onTableDoubleClicked(int row, int column) {
-    (void)column;
-    transactionTable->selectRow(row);
-    onEditTransaction();
+    onEditRequested(id);
 }
 
 void MainWindow::onHeaderClicked(int logicalIndex) {
-    if (logicalIndex == 4) {
-
-        currentSortColumn = 4;
-        transactionList.sortByDate();
-        if (!dateSortAscending) transactionList.reverseOrder();
-        dateSortAscending = !dateSortAscending;
-        transactionTable->horizontalHeader()->setSortIndicator(4, dateSortAscending ? Qt::AscendingOrder : Qt::DescendingOrder);
-        applyFiltersAndUpdateTable();
-    } else if (logicalIndex == 5) {
-
-        currentSortColumn = 5;
-        transactionList.sortByAmount();
-        if (!amountSortAscending) transactionList.reverseOrder();
-        amountSortAscending = !amountSortAscending;
-        transactionTable->horizontalHeader()->setSortIndicator(5, amountSortAscending ? Qt::AscendingOrder : Qt::DescendingOrder);
-        applyFiltersAndUpdateTable();
-    } else {
-
-        currentSortColumn = -1;
-        transactionTable->horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
-        applyFiltersAndUpdateTable();
-    }
+    tableManager->handleHeaderClick(logicalIndex, transactionList, currentSortColumn, dateSortAscending, amountSortAscending);
+    applyFiltersAndUpdateTable();
 }
 
 void MainWindow::onExportTxt() {
@@ -1082,14 +750,6 @@ void MainWindow::onExportTxt() {
     QMessageBox::information(this, QString::fromUtf8("Готово"), QString::fromUtf8("Транзакции выгружены в файл"));
 }
 
-void MainWindow::onApplyFilter() {
-    applyFiltersAndUpdateTable();
-}
-
-void MainWindow::onClearFilter() {
-    filtersPanel->resetFiltersToDefault();
-    applyFiltersAndUpdateTable();
-}
 
 void MainWindow::deleteTransactionById(size_t id) {
     if (const auto reply = QMessageBox::question(this,
@@ -1101,25 +761,13 @@ void MainWindow::deleteTransactionById(size_t id) {
     transactionList.deleteTransaction(id);
     transactionList.saveToDatabase();
     applyFiltersAndUpdateTable();
-    checkBudgetLimit();
-    updateSavingsRadar();
-    updateSavingsCounter();
 }
 
-void MainWindow::deleteSelectedRow() {
-    int row = transactionTable->currentRow();
-    if (row < 0) return;
-    const auto* idItem = transactionTable->item(row, 1);
-    if (!idItem) return;
-    size_t id = idItem->text().toULongLong();
-    deleteTransactionById(id);
-}
-
-void MainWindow::editTransactionById(size_t id) {
+void MainWindow::onEditRequested(size_t transactionId) {
     auto transactionsLocal = transactionList.getAllTransactions();
     auto it = std::find_if(transactionsLocal.begin(), transactionsLocal.end(),
-        [id](const std::shared_ptr<Transaction>& t) {
-            return t->getID() == id;
+        [transactionId](const std::shared_ptr<Transaction>& t) {
+            return t->getID() == transactionId;
         });
     if (it == transactionsLocal.end()) return;
 
@@ -1127,36 +775,18 @@ void MainWindow::editTransactionById(size_t id) {
     if (dialog.exec() != QDialog::Accepted) return;
 
     if (dialog.isDeleteRequested()) {
-        deleteTransactionById(id);
+        onDeleteRequested(transactionId);
         return;
     }
 
-    auto updatedTransaction = dialog.getUpdatedTransaction();
-    transactionList.updateTransaction(id, updatedTransaction);
+    auto updatedTransaction = dialog.getUpdatedTransaction(transactionId);
+    transactionList.updateTransaction(transactionId, updatedTransaction);
     transactionList.saveToDatabase();
     applyFiltersAndUpdateTable();
-    checkBudgetLimit();
-    updateSavingsRadar();
-    updateSavingsCounter();
 }
 
-void MainWindow::onTableContextMenu(const QPoint& pos) {
-    QModelIndex index = transactionTable->indexAt(pos);
-    QMenu menu(this);
-    const auto* editAct = menu.addAction(QString::fromUtf8("Редактировать"));
-    const auto* delAct = menu.addAction(QString::fromUtf8("Удалить"));
-    const auto* chosen = menu.exec(transactionTable->viewport()->mapToGlobal(pos));
-    if (!chosen) return;
-    int row = index.isValid() ? index.row() : transactionTable->currentRow();
-    if (row < 0) return;
-    const auto* idItem = transactionTable->item(row, 1);
-    if (!idItem) return;
-    size_t id = idItem->text().toULongLong();
-    if (chosen == editAct) {
-        editTransactionById(id);
-    } else if (chosen == delAct) {
-        deleteTransactionById(id);
-    }
+void MainWindow::onDeleteRequested(size_t transactionId) {
+    deleteTransactionById(transactionId);
 }
 
 void MainWindow::onAbout() {
@@ -1169,229 +799,6 @@ void MainWindow::onAbout() {
 void MainWindow::onBudgetSettings() {
     BudgetSettingsDialog dialog(budgetSettings, this);
     if (dialog.exec() == QDialog::Accepted) {
-        checkBudgetLimit();
+        budgetManager->checkBudgetLimit();
     }
-}
-
-void MainWindow::checkBudgetLimit() {
-    double monthlyLimit = budgetSettings->getMonthlyLimit();
-    double currentExpenses = transactionList.getCurrentMonthExpenses();
-    
-
-    updateBudgetInfo();
-    updateSavingsRadar();
-    
-
-    if (monthlyLimit <= 0) {
-        budgetWarningLabel->setVisible(false);
-        return;
-    }
-    
-
-
-
-    if (budgetSettings->shouldShowWarning(currentExpenses) || currentExpenses >= monthlyLimit) {
-        updateBudgetWarning();
-    } else {
-        budgetWarningLabel->setVisible(false);
-    }
-}
-
-void MainWindow::updateBudgetInfo() {
-    double monthlyLimit = budgetSettings->getMonthlyLimit();
-    double currentExpenses = transactionList.getCurrentMonthExpenses();
-    
-    if (monthlyLimit <= 0) {
-
-        budgetInfoLabel->setText(QString::fromUtf8("<span style='color: #666;'>Бюджет не настроен</span>"));
-        budgetInfoLabel->setVisible(true);
-        return;
-    }
-    
-    double remaining = monthlyLimit - currentExpenses;
-    double percentage = (currentExpenses / monthlyLimit) * 100.0;
-    
-    QString infoText;
-    QString color;
-    
-    if (currentExpenses >= monthlyLimit) {
-        color = "#d32f2f";
-        infoText = QString::fromUtf8("Бюджет: <b>%1</b> / %2 руб. (<span style='color: %3;'>%4%</span>) | Осталось: <span style='color: %3;'>%5 руб.</span>")
-                   .arg(currentExpenses, 0, 'f', 2)
-                   .arg(monthlyLimit, 0, 'f', 2)
-                   .arg(color)
-                   .arg(percentage, 0, 'f', 1)
-                   .arg(remaining, 0, 'f', 2);
-    } else if (percentage >= 90) {
-        color = "#f57c00";
-        infoText = QString::fromUtf8("Бюджет: <b>%1</b> / %2 руб. (<span style='color: %3;'>%4%</span>) | Осталось: %5 руб.")
-                   .arg(currentExpenses, 0, 'f', 2)
-                   .arg(monthlyLimit, 0, 'f', 2)
-                   .arg(color)
-                   .arg(percentage, 0, 'f', 1)
-                   .arg(remaining, 0, 'f', 2);
-    } else if (percentage >= 80) {
-        color = "#f9a825";
-        infoText = QString::fromUtf8("Бюджет: <b>%1</b> / %2 руб. (<span style='color: %3;'>%4%</span>) | Осталось: %5 руб.")
-                   .arg(currentExpenses, 0, 'f', 2)
-                   .arg(monthlyLimit, 0, 'f', 2)
-                   .arg(color)
-                   .arg(percentage, 0, 'f', 1)
-                   .arg(remaining, 0, 'f', 2);
-    } else {
-        color = "#4caf50";
-        infoText = QString::fromUtf8("Бюджет: <b>%1</b> / %2 руб. (<span style='color: %3;'>%4%</span>) | Осталось: %5 руб.")
-                   .arg(currentExpenses, 0, 'f', 2)
-                   .arg(monthlyLimit, 0, 'f', 2)
-                   .arg(color)
-                   .arg(percentage, 0, 'f', 1)
-                   .arg(remaining, 0, 'f', 2);
-    }
-    
-    budgetInfoLabel->setText(infoText);
-    budgetInfoLabel->setVisible(true);
-}
-
-void MainWindow::updateBudgetWarning() {
-    double monthlyLimit = budgetSettings->getMonthlyLimit();
-    double currentExpenses = transactionList.getCurrentMonthExpenses();
-    double remaining = monthlyLimit - currentExpenses;
-    double percentage = (currentExpenses / monthlyLimit) * 100.0;
-    
-    QString warningText;
-    QString color;
-    
-    if (currentExpenses >= monthlyLimit) {
-
-        warningText = QString::fromUtf8("⚠ Лимит превышен! Потрачено: %1 руб. из %2 руб. (%3%)")
-                      .arg(currentExpenses, 0, 'f', 2)
-                      .arg(monthlyLimit, 0, 'f', 2)
-                      .arg(percentage, 0, 'f', 1);
-        color = "#d32f2f";
-    } else if (percentage >= 90) {
-
-        warningText = QString::fromUtf8("⚠ Почти превышен лимит! Потрачено: %1 руб. из %2 руб. (%3%). Осталось: %4 руб.")
-                      .arg(currentExpenses, 0, 'f', 2)
-                      .arg(monthlyLimit, 0, 'f', 2)
-                      .arg(percentage, 0, 'f', 1)
-                      .arg(remaining, 0, 'f', 2);
-        color = "#f57c00";
-    } else {
-
-        warningText = QString::fromUtf8("⚠ Приближение к лимиту! Потрачено: %1 руб. из %2 руб. (%3%). Осталось: %4 руб.")
-                      .arg(currentExpenses, 0, 'f', 2)
-                      .arg(monthlyLimit, 0, 'f', 2)
-                      .arg(percentage, 0, 'f', 1)
-                      .arg(remaining, 0, 'f', 2);
-        color = "#f9a825";
-    }
-    
-    budgetWarningLabel->setText(QString("<span style='color: %1; font-weight: bold;'>%2</span>").arg(color, warningText));
-    budgetWarningLabel->setVisible(true);
-}
-
-void MainWindow::updateSavingsRadar() {
-    double plannedSavings = budgetSettings->getMonthlySavings();
-    double currentIncome = transactionList.getCurrentMonthIncome();
-    double currentExpenses = transactionList.getCurrentMonthExpenses();
-    double actualSavings = currentIncome - currentExpenses;
-    double totalBalance = transactionList.getTotalBalance();
-    double effectiveSavings = std::min(actualSavings, totalBalance);
-
-    if (plannedSavings <= 0.0) {
-        savingsProgressBar->setValue(0);
-        savingsStatusLabel->setText(QString::fromUtf8("<span style='color:#666;'>Задайте цель накоплений в настройках бюджета.</span>"));
-        savingsForecastLabel->setText(QString::fromUtf8("Переход: Настройки → Настройка бюджета..."));
-        return;
-    }
-    
-    double cappedSavings = std::clamp(effectiveSavings, 0.0, plannedSavings);
-    double progress = (plannedSavings > 0.0) ? (cappedSavings / plannedSavings) * 100.0 : 0.0;
-    const auto progressValue = static_cast<int>(std::round(std::clamp(progress, 0.0, 200.0)));
-    savingsProgressBar->setValue(std::min(progressValue, 100));
-
-    QString color = "#4caf50";
-    QString statusText;
-
-    if (effectiveSavings >= plannedSavings) {
-        color = "#2ecc71";
-        statusText = QString::fromUtf8("🎉 <span style='color:%1;'>Цель достигнута!</span> Накоплено <b>%2 руб.</b> из %3 руб.")
-            .arg(color)
-            .arg(cappedSavings, 0, 'f', 2)
-            .arg(plannedSavings, 0, 'f', 2);
-    } else if (progress >= 90.0) {
-        color = "#f57c00";
-        statusText = QString::fromUtf8("🔥 <span style='color:%1;'>Почти у цели!</span> Накоплено <b>%2 руб.</b> из %3 руб.")
-            .arg(color)
-            .arg(cappedSavings, 0, 'f', 2)
-            .arg(plannedSavings, 0, 'f', 2);
-    } else if (progress >= 60.0) {
-        color = "#f9a825";
-        statusText = QString::fromUtf8("⚡ <span style='color:%1;'>Хороший прогресс.</span> Накоплено <b>%2 руб.</b> из %3 руб.")
-            .arg(color)
-            .arg(cappedSavings, 0, 'f', 2)
-            .arg(plannedSavings, 0, 'f', 2);
-    } else if (progress >= 30.0) {
-        color = "#03a9f4";
-        statusText = QString::fromUtf8("🚀 <span style='color:%1;'>Вы в пути.</span> Накоплено <b>%2 руб.</b> из %3 руб.")
-            .arg(color)
-            .arg(cappedSavings, 0, 'f', 2)
-            .arg(plannedSavings, 0, 'f', 2);
-    } else if (actualSavings > 0.0) {
-        color = "#7986cb";
-        statusText = QString::fromUtf8("🌱 <span style='color:%1;'>Начало положено.</span> Накоплено <b>%2 руб.</b> из %3 руб.")
-            .arg(color)
-            .arg(cappedSavings, 0, 'f', 2)
-            .arg(plannedSavings, 0, 'f', 2);
-    } else {
-        color = "#ef5350";
-        statusText = QString::fromUtf8("❗ <span style='color:%1;'>Накоплений пока нет.</span> Цель: %2 руб.")
-            .arg(color)
-            .arg(plannedSavings, 0, 'f', 2);
-    }
-
-    savingsStatusLabel->setText(statusText);
-
-    QDate today = QDate::currentDate();
-    int dayOfMonth = today.day();
-    int daysInMonth = today.daysInMonth();
-    double dailyAverage = (dayOfMonth > 0) ? (actualSavings / dayOfMonth) : 0.0;
-    double projectedSavings = dailyAverage * daysInMonth;
-    double projectedDifference = projectedSavings - plannedSavings;
-
-    QString forecastText;
-    if (dailyAverage <= 0.0) {
-        forecastText = QString::fromUtf8("Совет: пока расход больше дохода. Проверьте бюджет и планируйте траты.");
-    } else if (projectedSavings >= plannedSavings) {
-        forecastText = QString::fromUtf8("Прогноз: к концу месяца будет ~<b>%1 руб.</b> (на %2 руб. больше цели).")
-            .arg(projectedSavings, 0, 'f', 2)
-            .arg(projectedDifference, 0, 'f', 2);
-    } else {
-        forecastText = QString::fromUtf8("Прогноз: ~<b>%1 руб.</b> к концу месяца. Не хватает %2 руб. — ускорьтесь!")
-            .arg(projectedSavings, 0, 'f', 2)
-            .arg(plannedSavings - projectedSavings, 0, 'f', 2);
-    }
-
-    savingsForecastLabel->setText(forecastText);
-}
-
-void MainWindow::updateSavingsCounter() {
-    double totalBalance = transactionList.getTotalBalance();
-    double currentMonthExpenses = transactionList.getCurrentMonthExpenses();
-
-    double remainingAfterMonth = totalBalance - currentMonthExpenses;
-
-    QString monthColor = remainingAfterMonth >= 0 ? "#2ecc71" : "#ff6b6b";
-    QString totalColor = totalBalance >= 0 ? "#4caf50" : "#e74c3c";
-
-    QString counterText = QString::fromUtf8(
-        "📅 <b>После расходов этого месяца останется:</b> <span style='color:%1; font-size:13pt;'>%2 руб.</span><br>"
-        "💎 <b>Текущий баланс:</b> <span style='color:%3; font-size:13pt;'>%4 руб.</span>"
-    )
-    .arg(monthColor)
-    .arg(remainingAfterMonth, 0, 'f', 2)
-    .arg(totalColor)
-    .arg(totalBalance, 0, 'f', 2);
-
-    totalSavingsLabel->setText(counterText);
 }

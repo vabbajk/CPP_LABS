@@ -20,6 +20,9 @@
 #include <QAction>
 #include "BudgetSettings.h"
 #include "BudgetSettingsDialog.h"
+#include "TransactionTableManager.h"
+#include "BudgetManager.h"
+#include "SavingsTracker.h"
 
 class FiltersPanel;
 
@@ -27,45 +30,29 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
-
     TransactionList transactionList{"homeaccounting.dat"};
     
-
     QWidget* centralWidget;
     QTableWidget* transactionTable;
     QPushButton* addIncomeButton;
     QPushButton* addExpenseButton;
-
     QLabel* balanceLabel;
-    QLabel* budgetInfoLabel;
-    QLabel* budgetWarningLabel;
-    QProgressBar* savingsProgressBar;
-    QLabel* savingsStatusLabel;
-    QLabel* savingsForecastLabel;
-    QLabel* totalSavingsLabel;
     
     BudgetSettings* budgetSettings = new BudgetSettings();
-
     FiltersPanel* filtersPanel;
+    
+    // Manager classes
+    TransactionTableManager* tableManager;
+    BudgetManager* budgetManager;
+    SavingsTracker* savingsTracker;
     
     void setupUI();
     void createMenuBar();
     void connectSignals();
-    void updateTable();
-    void updateBalance();
     void applyFiltersAndUpdateTable();
     void updateBalanceFor(const std::vector<std::shared_ptr<Transaction>>& list);
-    void rebuildTransactionTable(const std::vector<std::shared_ptr<Transaction>>& ordered);
-    void handleEditButtonClick();
     void deleteTransactionById(size_t id);
-    void deleteSelectedRow();
-    void editTransactionById(size_t id);
     void applyTheme(bool dark) const;
-    void checkBudgetLimit();
-    void updateBudgetInfo();
-    void updateBudgetWarning();
-    void updateSavingsRadar();
-    void updateSavingsCounter();
     void addTransaction(bool isIncome);
     
 private slots:
@@ -73,13 +60,11 @@ private slots:
     void onAddExpense();
     void onEditTransaction();
     void onHeaderClicked(int logicalIndex);
-    void onApplyFilter();
-    void onClearFilter();
     void onAbout();
-    void onTableDoubleClicked(int row, int column);
     void onExportTxt();
-    void onTableContextMenu(const QPoint& pos);
     void onBudgetSettings();
+    void onEditRequested(size_t transactionId);
+    void onDeleteRequested(size_t transactionId);
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
