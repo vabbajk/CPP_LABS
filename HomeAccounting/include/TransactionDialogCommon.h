@@ -168,6 +168,18 @@ inline QString getCommonTransactionDialogStyleSheet() {
     )");
 }
 
+struct TransactionDialogControls {
+    QVBoxLayout* mainLayout = nullptr;
+    QLineEdit* nameEdit = nullptr;
+    QComboBox* categoryCombo = nullptr;
+    QDateEdit* dateEdit = nullptr;
+    QDoubleSpinBox* amountSpinBox = nullptr;
+    QLineEdit* additionalInfoEdit = nullptr;
+    QPushButton* okButton = nullptr;
+    QPushButton* cancelButton = nullptr;
+    QPushButton* deleteButton = nullptr;
+};
+
 inline bool validateTransactionInputs(QWidget* parent,
                                       const QLineEdit* nameEdit,
                                       const QComboBox* categoryCombo,
@@ -206,116 +218,104 @@ inline void setupTransactionDialogUI(
     bool isNewTransaction,
     const QString& okButtonText,
     bool withDeleteButton,
-    QVBoxLayout*& mainLayout,
-    QLineEdit*& nameEdit,
-    QComboBox*& categoryCombo,
-    QDateEdit*& dateEdit,
-    QDoubleSpinBox*& amountSpinBox,
-    QLineEdit*& additionalInfoEdit,
-    QPushButton*& okButton,
-    QPushButton*& cancelButton,
-    QPushButton*& deleteButton
+    TransactionDialogControls& controls
 ) {
-    mainLayout = new QVBoxLayout(dialog);
-    mainLayout->setSpacing(16);
-    mainLayout->setContentsMargins(24, 24, 24, 24);
+    controls.mainLayout = new QVBoxLayout(dialog);
+    controls.mainLayout->setSpacing(16);
+    controls.mainLayout->setContentsMargins(24, 24, 24, 24);
 
     auto* formLayout = new QFormLayout();
     formLayout->setSpacing(12);
     formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
-    nameEdit = new QLineEdit(dialog);
+    controls.nameEdit = new QLineEdit(dialog);
     if (isNewTransaction) {
-        nameEdit->setPlaceholderText(QString::fromUtf8("Например: Зарплата"));
+        controls.nameEdit->setPlaceholderText(QString::fromUtf8("Например: Зарплата"));
     }
-    formLayout->addRow(QString::fromUtf8("Название:"), nameEdit);
+    formLayout->addRow(QString::fromUtf8("Название:"), controls.nameEdit);
 
-    categoryCombo = new QComboBox(dialog);
-    categoryCombo->addItems(isIncome ? getIncomeCategories() : getExpenseCategories());
-    formLayout->addRow(QString::fromUtf8("Категория:"), categoryCombo);
+    controls.categoryCombo = new QComboBox(dialog);
+    controls.categoryCombo->addItems(isIncome ? getIncomeCategories() : getExpenseCategories());
+    formLayout->addRow(QString::fromUtf8("Категория:"), controls.categoryCombo);
 
-    dateEdit = new QDateEdit(QDate::currentDate(), dialog);
-    dateEdit->setCalendarPopup(true);
-    dateEdit->setDisplayFormat("dd.MM.yyyy");
-    formLayout->addRow(QString::fromUtf8("Дата:"), dateEdit);
+    controls.dateEdit = new QDateEdit(QDate::currentDate(), dialog);
+    controls.dateEdit->setCalendarPopup(true);
+    controls.dateEdit->setDisplayFormat("dd.MM.yyyy");
+    formLayout->addRow(QString::fromUtf8("Дата:"), controls.dateEdit);
 
-    amountSpinBox = new QDoubleSpinBox(dialog);
-    amountSpinBox->setRange(0.01, 1000000.00);
-    amountSpinBox->setDecimals(2);
-    amountSpinBox->setSuffix(QString::fromUtf8(" руб."));
+    controls.amountSpinBox = new QDoubleSpinBox(dialog);
+    controls.amountSpinBox->setRange(0.01, 1000000.00);
+    controls.amountSpinBox->setDecimals(2);
+    controls.amountSpinBox->setSuffix(QString::fromUtf8(" руб."));
     if (isNewTransaction) {
-        amountSpinBox->setValue(100.00);
+        controls.amountSpinBox->setValue(100.00);
     }
-    formLayout->addRow(QString::fromUtf8("Сумма:"), amountSpinBox);
+    formLayout->addRow(QString::fromUtf8("Сумма:"), controls.amountSpinBox);
 
-    additionalInfoEdit = new QLineEdit(dialog);
+    controls.additionalInfoEdit = new QLineEdit(dialog);
     if (isNewTransaction) {
         if (isIncome) {
-            additionalInfoEdit->setPlaceholderText(QString::fromUtf8("Например: Основная работа"));
+            controls.additionalInfoEdit->setPlaceholderText(QString::fromUtf8("Например: Основная работа"));
         } else {
-            additionalInfoEdit->setPlaceholderText(QString::fromUtf8("Например: Магазин"));
+            controls.additionalInfoEdit->setPlaceholderText(QString::fromUtf8("Например: Магазин"));
         }
     }
     formLayout->addRow(
         isIncome
             ? QString::fromUtf8("Источник дохода:")
             : QString::fromUtf8("Место расхода:"),
-        additionalInfoEdit
+        controls.additionalInfoEdit
     );
 
-    mainLayout->addLayout(formLayout);
-    mainLayout->addSpacing(8);
+    controls.mainLayout->addLayout(formLayout);
+    controls.mainLayout->addSpacing(8);
 
     auto* buttonLayout = new QHBoxLayout();
     buttonLayout->setSpacing(12);
 
     if (withDeleteButton) {
-        deleteButton = new QPushButton(QString::fromUtf8("🗑 Удалить"), dialog);
-        deleteButton->setProperty("btnRole", "danger");
-        deleteButton->setMinimumHeight(40);
-        deleteButton->setCursor(Qt::PointingHandCursor);
-        buttonLayout->addWidget(deleteButton);
+        controls.deleteButton = new QPushButton(QString::fromUtf8("🗑 Удалить"), dialog);
+        controls.deleteButton->setProperty("btnRole", "danger");
+        controls.deleteButton->setMinimumHeight(40);
+        controls.deleteButton->setCursor(Qt::PointingHandCursor);
+        buttonLayout->addWidget(controls.deleteButton);
     } else {
-        deleteButton = nullptr;
+        controls.deleteButton = nullptr;
     }
 
     buttonLayout->addStretch();
 
-    okButton = new QPushButton(okButtonText, dialog);
-    okButton->setProperty("btnRole", "primary");
-    okButton->setMinimumHeight(40);
-    okButton->setCursor(Qt::PointingHandCursor);
-    okButton->setDefault(true);
+    controls.okButton = new QPushButton(okButtonText, dialog);
+    controls.okButton->setProperty("btnRole", "primary");
+    controls.okButton->setMinimumHeight(40);
+    controls.okButton->setCursor(Qt::PointingHandCursor);
+    controls.okButton->setDefault(true);
 
-    cancelButton = new QPushButton(QString::fromUtf8("✕ Отмена"), dialog);
-    cancelButton->setMinimumHeight(40);
-    cancelButton->setCursor(Qt::PointingHandCursor);
+    controls.cancelButton = new QPushButton(QString::fromUtf8("✕ Отмена"), dialog);
+    controls.cancelButton->setMinimumHeight(40);
+    controls.cancelButton->setCursor(Qt::PointingHandCursor);
 
-    buttonLayout->addWidget(cancelButton);
-    buttonLayout->addWidget(okButton);
+    buttonLayout->addWidget(controls.cancelButton);
+    buttonLayout->addWidget(controls.okButton);
 
-    mainLayout->addLayout(buttonLayout);
+    controls.mainLayout->addLayout(buttonLayout);
 
     dialog->setStyleSheet(getCommonTransactionDialogStyleSheet());
 }
 
 inline std::shared_ptr<Transaction> createTransactionFromInputs(
     bool isIncome,
-    const QLineEdit* nameEdit,
-    const QComboBox* categoryCombo,
-    const QDateEdit* dateEdit,
-    const QDoubleSpinBox* amountSpinBox,
-    const QLineEdit* additionalInfoEdit,
+    const TransactionDialogControls& controls,
     bool preserveId = false,
     size_t existingId = 0
 ) {
-    std::string name = nameEdit->text().toUtf8().constData();
-    std::string category = categoryCombo->currentText().toUtf8().constData();
-    QDate qdate = dateEdit->date();
+    std::string name = controls.nameEdit->text().toUtf8().constData();
+    std::string category = controls.categoryCombo->currentText().toUtf8().constData();
+    QDate qdate = controls.dateEdit->date();
     Date date(qdate.day(), qdate.month(), qdate.year());
-    double amount = amountSpinBox->value();
-    std::string additionalInfo = additionalInfoEdit->text().toUtf8().constData();
+    double amount = controls.amountSpinBox->value();
+    std::string additionalInfo = controls.additionalInfoEdit->text().toUtf8().constData();
 
     if (isIncome) {
         if (preserveId) {

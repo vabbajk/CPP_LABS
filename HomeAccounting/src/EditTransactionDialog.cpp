@@ -20,7 +20,7 @@ EditTransactionDialog::EditTransactionDialog(std::shared_ptr<Transaction> trans,
 }
 
 void EditTransactionDialog::setupUI() {
-    QVBoxLayout* mainLayout = nullptr;
+    TransactionDialogControls controls{};
 
     setupTransactionDialogUI(
         this,
@@ -28,16 +28,17 @@ void EditTransactionDialog::setupUI() {
         /* isNewTransaction */ false,
         QString::fromUtf8("✓ Сохранить"),
         /* withDeleteButton */ true,
-        mainLayout,
-        nameEdit,
-        categoryCombo,
-        dateEdit,
-        amountSpinBox,
-        additionalInfoEdit,
-        okButton,
-        cancelButton,
-        deleteButton
+        controls
     );
+
+    nameEdit = controls.nameEdit;
+    categoryCombo = controls.categoryCombo;
+    dateEdit = controls.dateEdit;
+    amountSpinBox = controls.amountSpinBox;
+    additionalInfoEdit = controls.additionalInfoEdit;
+    okButton = controls.okButton;
+    cancelButton = controls.cancelButton;
+    deleteButton = controls.deleteButton;
 
     connect(okButton, &QPushButton::clicked, this, &EditTransactionDialog::onAccept);
     connect(deleteButton, &QPushButton::clicked, this, &EditTransactionDialog::onDeleteClicked);
@@ -92,13 +93,16 @@ void EditTransactionDialog::onDeleteClicked() {
 
 std::shared_ptr<Transaction> EditTransactionDialog::getUpdatedTransaction() const {
     size_t existingId = transaction ? transaction->getID() : 0;
+    TransactionDialogControls controls{};
+    controls.nameEdit = nameEdit;
+    controls.categoryCombo = categoryCombo;
+    controls.dateEdit = dateEdit;
+    controls.amountSpinBox = amountSpinBox;
+    controls.additionalInfoEdit = additionalInfoEdit;
+
     return createTransactionFromInputs(
         isIncome,
-        nameEdit,
-        categoryCombo,
-        dateEdit,
-        amountSpinBox,
-        additionalInfoEdit,
+        controls,
         /* preserveId */ true,
         existingId
     );

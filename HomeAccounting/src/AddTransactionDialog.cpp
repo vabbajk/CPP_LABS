@@ -17,8 +17,7 @@ AddTransactionDialog::AddTransactionDialog(bool isIncome, QWidget *parent)
 }
 
 void AddTransactionDialog::setupUI() {
-    QVBoxLayout* mainLayout = nullptr;
-    QPushButton* deleteButton = nullptr;
+    TransactionDialogControls controls{};
 
     setupTransactionDialogUI(
         this,
@@ -26,16 +25,16 @@ void AddTransactionDialog::setupUI() {
         /* isNewTransaction */ true,
         QString::fromUtf8("✓ Добавить"),
         /* withDeleteButton */ false,
-        mainLayout,
-        nameEdit,
-        categoryCombo,
-        dateEdit,
-        amountSpinBox,
-        additionalInfoEdit,
-        okButton,
-        cancelButton,
-        deleteButton
+        controls
     );
+
+    nameEdit = controls.nameEdit;
+    categoryCombo = controls.categoryCombo;
+    dateEdit = controls.dateEdit;
+    amountSpinBox = controls.amountSpinBox;
+    additionalInfoEdit = controls.additionalInfoEdit;
+    okButton = controls.okButton;
+    cancelButton = controls.cancelButton;
 
     connect(okButton, &QPushButton::clicked, this, &AddTransactionDialog::onAccept);
     connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
@@ -52,13 +51,16 @@ void AddTransactionDialog::onAccept() {
 }
 
 std::shared_ptr<Transaction> AddTransactionDialog::getTransaction() const {
+    TransactionDialogControls controls{};
+    controls.nameEdit = nameEdit;
+    controls.categoryCombo = categoryCombo;
+    controls.dateEdit = dateEdit;
+    controls.amountSpinBox = amountSpinBox;
+    controls.additionalInfoEdit = additionalInfoEdit;
+
     return createTransactionFromInputs(
         isIncome,
-        nameEdit,
-        categoryCombo,
-        dateEdit,
-        amountSpinBox,
-        additionalInfoEdit,
+        controls,
         /* preserveId */ false,
         /* existingId */ 0
     );
