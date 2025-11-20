@@ -61,6 +61,20 @@ bool Database::isOpen() const {
 }
 
 
+bool Database::writeBytes(const void* data, std::size_t size) {
+    const auto* bytes = static_cast<const std::byte*>(data);
+    if (!file.write(reinterpret_cast<const char*>(bytes), static_cast<std::streamsize>(size))) {
+        return false;
+    }
+    return file.good();
+}
+
+void Database::readBytes(void* data, std::size_t size) {
+    auto* bytes = static_cast<std::byte*>(data);
+    file.read(reinterpret_cast<char*>(bytes), static_cast<std::streamsize>(size));
+}
+
+
 bool Database::writeString(const std::string& str) {
     auto length = str.length();
     if (!writeSize(length)) return false;
@@ -73,37 +87,18 @@ bool Database::writeDate(const Date& date) {
     int month = date.getMonth();
     int year = date.getYear();
 
-    if (const auto* dayBytes = reinterpret_cast<const std::byte*>(&day);
-        !file.write(reinterpret_cast<const char*>(dayBytes), sizeof(day))) {
-        return false;
-    }
-
-    if (const auto* monthBytes = reinterpret_cast<const std::byte*>(&month);
-        !file.write(reinterpret_cast<const char*>(monthBytes), sizeof(month))) {
-        return false;
-    }
-
-    if (const auto* yearBytes = reinterpret_cast<const std::byte*>(&year);
-        !file.write(reinterpret_cast<const char*>(yearBytes), sizeof(year))) {
-        return false;
-    }
-    return file.good();
+    if (!writeBytes(&day, sizeof(day)))   return false;
+    if (!writeBytes(&month, sizeof(month))) return false;
+    if (!writeBytes(&year, sizeof(year)))  return false;
+    return true;
 }
 
 bool Database::writeDouble(double value) {
-    if (const auto* bytes = reinterpret_cast<const std::byte*>(&value);
-        !file.write(reinterpret_cast<const char*>(bytes), sizeof(value))) {
-        return false;
-    }
-    return file.good();
+    return writeBytes(&value, sizeof(value));
 }
 
 bool Database::writeSize(size_t value) {
-    if (const auto* bytes = reinterpret_cast<const std::byte*>(&value);
-        !file.write(reinterpret_cast<const char*>(bytes), sizeof(value))) {
-        return false;
-    }
-    return file.good();
+    return writeBytes(&value, sizeof(value));
 }
 
 std::string Database::readString() {
@@ -118,28 +113,21 @@ Date Database::readDate() {
     int month;
     int year;
 
-    auto* dayBytes = reinterpret_cast<std::byte*>(&day);
-    file.read(reinterpret_cast<char*>(dayBytes), sizeof(day));
-
-    auto* monthBytes = reinterpret_cast<std::byte*>(&month);
-    file.read(reinterpret_cast<char*>(monthBytes), sizeof(month));
-
-    auto* yearBytes = reinterpret_cast<std::byte*>(&year);
-    file.read(reinterpret_cast<char*>(yearBytes), sizeof(year));
+    readBytes(&day, sizeof(day));
+    readBytes(&month, sizeof(month));
+    readBytes(&year, sizeof(year));
     return Date(day, month, year);
 }
 
 double Database::readDouble() {
     double value;
-    auto* bytes = reinterpret_cast<std::byte*>(&value);
-    file.read(reinterpret_cast<char*>(bytes), sizeof(value));
+    readBytes(&value, sizeof(value));
     return value;
 }
 
 size_t Database::readSize() {
     size_t value;
-    auto* bytes = reinterpret_cast<std::byte*>(&value);
-    file.read(reinterpret_cast<char*>(bytes), sizeof(value));
+    readBytes(&value, sizeof(value));
     return value;
 }
 
@@ -184,8 +172,7 @@ bool Database::writeTransaction(const Transaction& transaction) {
 std::shared_ptr<Transaction> Database::readTransaction() {
 
     int type;
-    auto* typeBytes = reinterpret_cast<std::byte*>(&type);
-    file.read(reinterpret_cast<char*>(typeBytes), sizeof(type));
+    readBytes(&type, sizeof(type));
     if (!file.good()) {
         throw DatabaseReadException("Failed to read transaction type");
     }
@@ -307,8 +294,7 @@ TransactionList Database::loadTransactionList() {
 
         auto pos = file.tellg();
         int test_type;
-        auto* typeBytes = reinterpret_cast<std::byte*>(&test_type);
-        file.read(reinterpret_cast<char*>(typeBytes), sizeof(test_type));
+        readBytes(&test_type, sizeof(test_type));
         
         if (!file.good() || file.eof()) {
 

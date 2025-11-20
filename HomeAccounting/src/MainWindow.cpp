@@ -882,7 +882,7 @@ void MainWindow::updateTable() {
                 additionalInfo = QString::fromUtf8(expense->getWhere().c_str());
         }
 
-        QTableWidgetItem* typeItem = new QTableWidgetItem(type);
+        auto* typeItem = new QTableWidgetItem(type);
         typeItem->setTextAlignment(Qt::AlignCenter);
         transactionTable->setItem(row, 6, typeItem);
 

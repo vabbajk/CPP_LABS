@@ -107,8 +107,7 @@ StatsDialog::StatsDialog(const TransactionList* list, QWidget* parent)
     main->addLayout(charts);
     
     auto* closeBox = new QDialogButtonBox(QDialogButtonBox::Close, this);
-    auto* closeBtn = closeBox->button(QDialogButtonBox::Close);
-    if (closeBtn) {
+    if (auto* closeBtn = closeBox->button(QDialogButtonBox::Close); closeBtn) {
         closeBtn->setText(QString::fromUtf8("Закрыть"));
         closeBtn->setMinimumHeight(40);
         closeBtn->setMinimumWidth(120);
@@ -208,9 +207,11 @@ void StatsDialog::recalc() const {
     if (qFrom <= qTo) {
         auto all = transactionList->getAllTransactions();
         for (const auto& t : all) {
-            Date d = t->getDate();
-            QDate qd(d.getYear(), d.getMonth(), d.getDay());
-            if (qd < qFrom || qTo < qd) continue;
+            const Date d = t->getDate();
+            if (QDate qd(d.getYear(), d.getMonth(), d.getDay());
+                qd < qFrom || qTo < qd) {
+                continue;
+            }
             QString cat = QString::fromUtf8(t->getCategory().c_str());
             if (t->getType() == 1) {
                 incomeAgg[cat] += t->getAmount();

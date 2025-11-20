@@ -17,11 +17,13 @@ private:
     bool writeDate(const Date& date);
     bool writeDouble(double value);
     bool writeSize(size_t value);
+    bool writeBytes(const void* data, std::size_t size);
     
     std::string readString();
     Date readDate();
     double readDouble();
     size_t readSize();
+    void readBytes(void* data, std::size_t size);
     
 
     bool writeTransaction(const Transaction& transaction);

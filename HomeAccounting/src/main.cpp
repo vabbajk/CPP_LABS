@@ -8,14 +8,14 @@
 #endif
 
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    Q_UNUSED(hInstance);
-    Q_UNUSED(hPrevInstance);
-    Q_UNUSED(lpCmdLine);
-    Q_UNUSED(nCmdShow);
+    (void)hInstance;
+    (void)hPrevInstance;
+    (void)lpCmdLine;
+    (void)nCmdShow;
     
     int argc = 0;
     char** argv = nullptr;
@@ -25,14 +25,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         QTextCodec::setCodecForLocale(QTextCodec::codecForName("Windows-1251"));
     #endif
 
-    app.setStyle("Fusion");
+    QApplication::setStyle("Fusion");
     QFont font("Segoe UI", 10);
-    app.setFont(font);
+    QApplication::setFont(font);
 
     MainWindow window;
     window.show();
 
-    return app.exec();
+    return QApplication::exec();
 }
 
 #else
@@ -45,11 +45,11 @@ int main(int argc, char *argv[]) {
 
     app.setStyle("Fusion");
     QFont font("Segoe UI", 10);
-    app.setFont(font);
+    QApplication::setFont(font);
 
     MainWindow window;
     window.show();
 
-    return app.exec();
+    return QApplication::exec();
 }
 #endif
