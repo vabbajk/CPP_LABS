@@ -1,22 +1,29 @@
 #include "../include/Transaction.h"
+#include <stdexcept>
 
+namespace {
+class TransactionIdException : public std::runtime_error {
+public:
+    using std::runtime_error::runtime_error;
+};
+}
 
 size_t Transaction::nextID = 1;
 
-Transaction::Transaction(std::string name, std::string category, Date date, double amount) :
-    id(nextID++), name(std::move(name)), category(std::move(category)), date(date), amount(amount){
+Transaction::Transaction(const std::string& name, const std::string& category, Date date, double amount) :
+    id(nextID++), name(name), category(category), date(date), amount(amount){
 
     if (id == 0) {
-        throw std::runtime_error("Ошибка инициализации ID транзакции");
+        throw TransactionIdException("Ошибка инициализации ID транзакции");
     }
 }
 
 
-Transaction::Transaction(size_t existingID, std::string name, std::string category, Date date, double amount) :
-    id(existingID), name(std::move(name)), category(std::move(category)), date(date), amount(amount){
+Transaction::Transaction(size_t existingID, const std::string& name, const std::string& category, Date date, double amount) :
+    id(existingID), name(name), category(category), date(date), amount(amount){
 
     if (id == 0) {
-        throw std::runtime_error("Ошибка инициализации ID транзакции");
+        throw TransactionIdException("Ошибка инициализации ID транзакции");
     }
 }
 
@@ -50,13 +57,15 @@ Date Transaction::getDate() const {
 
 
 
-IncomeTransaction::IncomeTransaction(std::string name, std::string category, Date date, double amount, std::string incomeSource):
+IncomeTransaction::IncomeTransaction(const std::string& name, const std::string& category, Date date, double amount, const std::string& incomeSource):
     Transaction(name, category, date, amount), incomeSource(incomeSource) {}
 
-IncomeTransaction::IncomeTransaction(size_t existingID, std::string name, std::string category, Date date, double amount, std::string incomeSource):
+IncomeTransaction::IncomeTransaction(size_t existingID, const std::string& name, const std::string& category, Date date, double amount, const std::string& incomeSource):
     Transaction(existingID, name, category, date, amount), incomeSource(incomeSource) {}
 
-void IncomeTransaction::print(){}
+void IncomeTransaction::print(){
+    std::cout << *this;
+}
 
 int IncomeTransaction::getType(){
     return 1;
@@ -67,13 +76,15 @@ std::string IncomeTransaction::getIncomeSource() const {
 }
 
 
-Expense::Expense(std::string name, std::string category, Date date, double amount, std::string where):
+Expense::Expense(const std::string& name, const std::string& category, Date date, double amount, const std::string& where):
     Transaction(name, category, date, amount), where(where) {}
 
-Expense::Expense(size_t existingID, std::string name, std::string category, Date date, double amount, std::string where):
+Expense::Expense(size_t existingID, const std::string& name, const std::string& category, Date date, double amount, const std::string& where):
     Transaction(existingID, name, category, date, amount), where(where) {}
 
-void Expense::print() {}
+void Expense::print() {
+    std::cout << *this;
+}
 
 int Expense::getType(){
     return 0;

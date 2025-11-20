@@ -1,13 +1,20 @@
 #include "../include/HelpfulClasses.h"
 
 #include <chrono>
-#include <time.h>
-#include <sstream>
-#include <iomanip>
+#include <ctime>
+#include <format>
 
 Date::Date(){
-    std::time_t now = std::time(nullptr);
+    using std::chrono::system_clock;
+    auto now = system_clock::now();
+    std::time_t timeNow = system_clock::to_time_t(now);
     std::tm local_tm{};
+
+#ifdef _WIN32
+    localtime_s(&local_tm, &timeNow);
+#else
+    localtime_r(&timeNow, &local_tm);
+#endif
 
     day = local_tm.tm_mday;
     month = local_tm.tm_mon + 1;
@@ -29,10 +36,5 @@ int Date::getYear() const {
 }
 
 std::string Date::getDate() const{
-    std::ostringstream oss;
-    oss << std::setw(2) << std::setfill('0') << day << "."
-        << std::setw(2) << std::setfill('0') << month << "."
-        << year;
-    return oss.str();
+	return std::format("{:02}.{:02}.{}", day, month, year);
 }
-

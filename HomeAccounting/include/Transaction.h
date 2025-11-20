@@ -14,8 +14,8 @@ class Transaction {
         double amount;
 
     public:
-        Transaction(std::string name, std::string category, Date date, double amount);
-        Transaction(size_t existingID, std::string name, std::string category, Date date, double amount);
+        Transaction(const std::string& name, const std::string& category, Date date, double amount);
+        Transaction(size_t existingID, const std::string& name, const std::string& category, Date date, double amount);
         virtual ~Transaction() = default;
 
         virtual void print() = 0;
@@ -34,8 +34,8 @@ class IncomeTransaction : public Transaction {
     private:
         std::string incomeSource;
     public:
-        IncomeTransaction(std::string name, std::string category, Date date, double amount, std::string incomeSource);
-        IncomeTransaction(size_t existingID, std::string name, std::string category, Date date, double amount, std::string incomeSource);
+        IncomeTransaction(const std::string& name, const std::string& category, Date date, double amount, const std::string& incomeSource);
+        IncomeTransaction(size_t existingID, const std::string& name, const std::string& category, Date date, double amount, const std::string& incomeSource);
         ~IncomeTransaction() override = default;
 
         void print() override;
@@ -59,8 +59,8 @@ class Expense : public Transaction {
 private:
     std::string where;
 public:
-    Expense(std::string name, std::string category, Date date, double amount, std::string where);
-    Expense(size_t existingID, std::string name, std::string category, Date date, double amount, std::string where);
+    Expense(const std::string& name, const std::string& category, Date date, double amount, const std::string& where);
+    Expense(size_t existingID, const std::string& name, const std::string& category, Date date, double amount, const std::string& where);
     ~Expense() override = default;
 
     void print() override;

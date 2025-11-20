@@ -10,8 +10,7 @@
 namespace {
 class DatabaseReadException : public std::runtime_error {
 public:
-    explicit DatabaseReadException(const std::string& message)
-        : std::runtime_error(message) {}
+    using std::runtime_error::runtime_error;
 };
 }
 
@@ -74,26 +73,36 @@ bool Database::writeDate(const Date& date) {
     int month = date.getMonth();
     int year = date.getYear();
 
-    const auto* dayBytes = reinterpret_cast<const std::byte*>(&day);
-    if (!file.write(reinterpret_cast<const char*>(dayBytes), sizeof(day))) return false;
+    if (const auto* dayBytes = reinterpret_cast<const std::byte*>(&day);
+        !file.write(reinterpret_cast<const char*>(dayBytes), sizeof(day))) {
+        return false;
+    }
 
-    const auto* monthBytes = reinterpret_cast<const std::byte*>(&month);
-    if (!file.write(reinterpret_cast<const char*>(monthBytes), sizeof(month))) return false;
+    if (const auto* monthBytes = reinterpret_cast<const std::byte*>(&month);
+        !file.write(reinterpret_cast<const char*>(monthBytes), sizeof(month))) {
+        return false;
+    }
 
-    const auto* yearBytes = reinterpret_cast<const std::byte*>(&year);
-    if (!file.write(reinterpret_cast<const char*>(yearBytes), sizeof(year))) return false;
+    if (const auto* yearBytes = reinterpret_cast<const std::byte*>(&year);
+        !file.write(reinterpret_cast<const char*>(yearBytes), sizeof(year))) {
+        return false;
+    }
     return file.good();
 }
 
 bool Database::writeDouble(double value) {
-    const auto* bytes = reinterpret_cast<const std::byte*>(&value);
-    if (!file.write(reinterpret_cast<const char*>(bytes), sizeof(value))) return false;
+    if (const auto* bytes = reinterpret_cast<const std::byte*>(&value);
+        !file.write(reinterpret_cast<const char*>(bytes), sizeof(value))) {
+        return false;
+    }
     return file.good();
 }
 
 bool Database::writeSize(size_t value) {
-    const auto* bytes = reinterpret_cast<const std::byte*>(&value);
-    if (!file.write(reinterpret_cast<const char*>(bytes), sizeof(value))) return false;
+    if (const auto* bytes = reinterpret_cast<const std::byte*>(&value);
+        !file.write(reinterpret_cast<const char*>(bytes), sizeof(value))) {
+        return false;
+    }
     return file.good();
 }
 
@@ -105,7 +114,10 @@ std::string Database::readString() {
 }
 
 Date Database::readDate() {
-    int day, month, year;
+    int day;
+    int month;
+    int year;
+
     auto* dayBytes = reinterpret_cast<std::byte*>(&day);
     file.read(reinterpret_cast<char*>(dayBytes), sizeof(day));
 
@@ -137,8 +149,8 @@ bool Database::writeTransaction(const Transaction& transaction) {
     }
 
     int type = -1;
-    const IncomeTransaction* income = dynamic_cast<const IncomeTransaction*>(&transaction);
-    const Expense* expense = dynamic_cast<const Expense*>(&transaction);
+    const auto* income = dynamic_cast<const IncomeTransaction*>(&transaction);
+    const auto* expense = dynamic_cast<const Expense*>(&transaction);
 
     if (income) {
         type = 0;
@@ -148,7 +160,10 @@ bool Database::writeTransaction(const Transaction& transaction) {
         return false;
     }
 
-    file.write(reinterpret_cast<const char*>(&type), sizeof(type));
+    if (const auto* typeBytes = reinterpret_cast<const std::byte*>(&type);
+        !file.write(reinterpret_cast<const char*>(typeBytes), sizeof(type))) {
+        return false;
+    }
     if (!file.good()) return false;
 
     if (!writeSize(transaction.getID())) return false;
@@ -157,10 +172,10 @@ bool Database::writeTransaction(const Transaction& transaction) {
     if (!writeDate(transaction.getDate())) return false;
     if (!writeDouble(transaction.getAmount())) return false;
 
-    if (income) {
-        if (!writeString(income->getIncomeSource())) return false;
-    } else if (expense) {
-        if (!writeString(expense->getWhere())) return false;
+    if (income && !writeString(income->getIncomeSource())) {
+        return false;
+    } else if (expense && !writeString(expense->getWhere())) {
+        return false;
     }
 
     return true;
@@ -169,7 +184,8 @@ bool Database::writeTransaction(const Transaction& transaction) {
 std::shared_ptr<Transaction> Database::readTransaction() {
 
     int type;
-    file.read(reinterpret_cast<char*>(&type), sizeof(int));
+    auto* typeBytes = reinterpret_cast<std::byte*>(&type);
+    file.read(reinterpret_cast<char*>(typeBytes), sizeof(type));
     if (!file.good()) {
         throw DatabaseReadException("Failed to read transaction type");
     }
@@ -285,8 +301,9 @@ TransactionList Database::loadTransactionList() {
     
     int count = 0;
     size_t maxID = 0;
+    bool readError = false;
     
-    while (file.good() && !file.eof()) {
+    while (file.good() && !file.eof() && !readError) {
 
         auto pos = file.tellg();
         int test_type;
@@ -313,7 +330,7 @@ TransactionList Database::loadTransactionList() {
             count++;
         } catch (const DatabaseReadException& e) {
             std::cerr << "Ошибка при чтении транзакции #" << (count + 1) << ": " << e.what() << std::endl;
-            break;
+            readError = true;
         }
     }
     
