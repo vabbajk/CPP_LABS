@@ -63,6 +63,7 @@ private:
     void updateBalanceFor(const std::list<std::shared_ptr<Transaction>>& list);
     void deleteTransactionById(size_t id);
     void deleteSelectedRow();
+    void editTransactionById(size_t id);
     void applyTheme(bool dark);
     void checkBudgetLimit();
     void updateBudgetInfo();

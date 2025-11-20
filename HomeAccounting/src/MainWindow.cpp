@@ -1122,27 +1122,7 @@ void MainWindow::updateTable() {
 
         connect(editRowButton, &QPushButton::clicked, this, [this, editRowButton]() {
             size_t id = static_cast<size_t>(editRowButton->property("transactionId").toULongLong());
-            auto transactionsLocal = transactionList.getAllTransactions();
-
-            for (const auto& trans : transactionsLocal) {
-                if (trans->getID() == id) {
-                    EditTransactionDialog dialog(trans, this);
-                    if (dialog.exec() == QDialog::Accepted) {
-                        if (dialog.isDeleteRequested()) {
-                            deleteTransactionById(id);
-                        } else {
-                            auto updatedTransaction = dialog.getUpdatedTransaction();
-                            transactionList.updateTransaction(id, updatedTransaction);
-                            transactionList.saveToDatabase();
-                            applyFiltersAndUpdateTable();
-                            checkBudgetLimit();
-                            updateSavingsRadar();
-                            updateSavingsCounter();
-                        }
-                    }
-                    break;
-                }
-            }
+            editTransactionById(id);
         });
 
         row++;
@@ -1344,6 +1324,29 @@ void MainWindow::deleteSelectedRow() {
     deleteTransactionById(id);
 }
 
+void MainWindow::editTransactionById(size_t id) {
+    auto transactionsLocal = transactionList.getAllTransactions();
+    for (const auto& trans : transactionsLocal) {
+        if (trans->getID() == id) {
+            EditTransactionDialog dialog(trans, this);
+            if (dialog.exec() == QDialog::Accepted) {
+                if (dialog.isDeleteRequested()) {
+                    deleteTransactionById(id);
+                } else {
+                    auto updatedTransaction = dialog.getUpdatedTransaction();
+                    transactionList.updateTransaction(id, updatedTransaction);
+                    transactionList.saveToDatabase();
+                    applyFiltersAndUpdateTable();
+                    checkBudgetLimit();
+                    updateSavingsRadar();
+                    updateSavingsCounter();
+                }
+            }
+            break;
+        }
+    }
+}
+
 void MainWindow::onTableContextMenu(const QPoint& pos) {
     QModelIndex index = transactionTable->indexAt(pos);
     QMenu menu(this);
@@ -1357,26 +1360,7 @@ void MainWindow::onTableContextMenu(const QPoint& pos) {
     if (!idItem) return;
     size_t id = idItem->text().toULongLong();
     if (chosen == editAct) {
-        auto transactionsLocal = transactionList.getAllTransactions();
-        for (const auto& trans : transactionsLocal) {
-            if (trans->getID() == id) {
-                EditTransactionDialog dialog(trans, this);
-                if (dialog.exec() == QDialog::Accepted) {
-                    if (dialog.isDeleteRequested()) {
-                        deleteTransactionById(id);
-                    } else {
-                        auto updatedTransaction = dialog.getUpdatedTransaction();
-                        transactionList.updateTransaction(id, updatedTransaction);
-                        transactionList.saveToDatabase();
-                        applyFiltersAndUpdateTable();
-                        checkBudgetLimit();
-                        updateSavingsRadar();
-                        updateSavingsCounter();
-                    }
-                }
-                break;
-            }
-        }
+        editTransactionById(id);
     } else if (chosen == delAct) {
         deleteTransactionById(id);
     }

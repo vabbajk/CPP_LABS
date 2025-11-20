@@ -5,6 +5,16 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QMessageBox>
+#include <QVBoxLayout>
+#include <QFormLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QDateEdit>
+#include <QDoubleSpinBox>
+#include <QDate>
+#include <QDialog>
+#include <memory>
+#include "Transaction.h"
 
 inline QStringList getIncomeCategories() {
     return {
@@ -188,4 +198,134 @@ inline bool validateTransactionInputs(QWidget* parent,
     }
 
     return true;
+}
+
+inline void setupTransactionDialogUI(
+    QDialog* dialog,
+    bool isIncome,
+    bool isNewTransaction,
+    const QString& okButtonText,
+    bool withDeleteButton,
+    QVBoxLayout*& mainLayout,
+    QLineEdit*& nameEdit,
+    QComboBox*& categoryCombo,
+    QDateEdit*& dateEdit,
+    QDoubleSpinBox*& amountSpinBox,
+    QLineEdit*& additionalInfoEdit,
+    QPushButton*& okButton,
+    QPushButton*& cancelButton,
+    QPushButton*& deleteButton
+) {
+    mainLayout = new QVBoxLayout(dialog);
+    mainLayout->setSpacing(16);
+    mainLayout->setContentsMargins(24, 24, 24, 24);
+
+    QFormLayout* formLayout = new QFormLayout();
+    formLayout->setSpacing(12);
+    formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+
+    nameEdit = new QLineEdit(dialog);
+    if (isNewTransaction) {
+        nameEdit->setPlaceholderText(QString::fromUtf8("Например: Зарплата"));
+    }
+    formLayout->addRow(QString::fromUtf8("Название:"), nameEdit);
+
+    categoryCombo = new QComboBox(dialog);
+    categoryCombo->addItems(isIncome ? getIncomeCategories() : getExpenseCategories());
+    formLayout->addRow(QString::fromUtf8("Категория:"), categoryCombo);
+
+    dateEdit = new QDateEdit(QDate::currentDate(), dialog);
+    dateEdit->setCalendarPopup(true);
+    dateEdit->setDisplayFormat("dd.MM.yyyy");
+    formLayout->addRow(QString::fromUtf8("Дата:"), dateEdit);
+
+    amountSpinBox = new QDoubleSpinBox(dialog);
+    amountSpinBox->setRange(0.01, 1000000.00);
+    amountSpinBox->setDecimals(2);
+    amountSpinBox->setSuffix(QString::fromUtf8(" руб."));
+    if (isNewTransaction) {
+        amountSpinBox->setValue(100.00);
+    }
+    formLayout->addRow(QString::fromUtf8("Сумма:"), amountSpinBox);
+
+    additionalInfoEdit = new QLineEdit(dialog);
+    if (isNewTransaction) {
+        if (isIncome) {
+            additionalInfoEdit->setPlaceholderText(QString::fromUtf8("Например: Основная работа"));
+        } else {
+            additionalInfoEdit->setPlaceholderText(QString::fromUtf8("Например: Магазин"));
+        }
+    }
+    formLayout->addRow(
+        isIncome
+            ? QString::fromUtf8("Источник дохода:")
+            : QString::fromUtf8("Место расхода:"),
+        additionalInfoEdit
+    );
+
+    mainLayout->addLayout(formLayout);
+    mainLayout->addSpacing(8);
+
+    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    buttonLayout->setSpacing(12);
+
+    if (withDeleteButton) {
+        deleteButton = new QPushButton(QString::fromUtf8("🗑 Удалить"), dialog);
+        deleteButton->setProperty("btnRole", "danger");
+        deleteButton->setMinimumHeight(40);
+        deleteButton->setCursor(Qt::PointingHandCursor);
+        buttonLayout->addWidget(deleteButton);
+    } else {
+        deleteButton = nullptr;
+    }
+
+    buttonLayout->addStretch();
+
+    okButton = new QPushButton(okButtonText, dialog);
+    okButton->setProperty("btnRole", "primary");
+    okButton->setMinimumHeight(40);
+    okButton->setCursor(Qt::PointingHandCursor);
+    okButton->setDefault(true);
+
+    cancelButton = new QPushButton(QString::fromUtf8("✕ Отмена"), dialog);
+    cancelButton->setMinimumHeight(40);
+    cancelButton->setCursor(Qt::PointingHandCursor);
+
+    buttonLayout->addWidget(cancelButton);
+    buttonLayout->addWidget(okButton);
+
+    mainLayout->addLayout(buttonLayout);
+
+    dialog->setStyleSheet(getCommonTransactionDialogStyleSheet());
+}
+
+inline std::shared_ptr<Transaction> createTransactionFromInputs(
+    bool isIncome,
+    const QLineEdit* nameEdit,
+    const QComboBox* categoryCombo,
+    const QDateEdit* dateEdit,
+    const QDoubleSpinBox* amountSpinBox,
+    const QLineEdit* additionalInfoEdit,
+    bool preserveId = false,
+    size_t existingId = 0
+) {
+    std::string name = nameEdit->text().toUtf8().constData();
+    std::string category = categoryCombo->currentText().toUtf8().constData();
+    QDate qdate = dateEdit->date();
+    Date date(qdate.day(), qdate.month(), qdate.year());
+    double amount = amountSpinBox->value();
+    std::string additionalInfo = additionalInfoEdit->text().toUtf8().constData();
+
+    if (isIncome) {
+        if (preserveId) {
+            return std::make_shared<IncomeTransaction>(existingId, name, category, date, amount, additionalInfo);
+        }
+        return std::make_shared<IncomeTransaction>(name, category, date, amount, additionalInfo);
+    } else {
+        if (preserveId) {
+            return std::make_shared<Expense>(existingId, name, category, date, amount, additionalInfo);
+        }
+        return std::make_shared<Expense>(name, category, date, amount, additionalInfo);
+    }
 }
