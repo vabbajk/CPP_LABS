@@ -11,6 +11,8 @@
 #include <QPushButton>
 #include "TransactionList.h"
 
+#include <algorithm>
+
 class PieChartWidget : public QWidget {
     Q_OBJECT
 public:
@@ -37,7 +39,7 @@ protected:
         p.setPen(QColor(88,166,255));
         p.drawText(rect.left(), rect.top(), rect.width(), 30, Qt::AlignLeft | Qt::AlignVCenter, chartTitle);
 
-        QRect pieRect = QRect(rect.left(), rect.top() + 45, rect.height() - 50, rect.height() - 50);
+        auto pieRect = QRect(rect.left(), rect.top() + 45, rect.height() - 50, rect.height() - 50);
         if (pieRect.width() > rect.width()/2) {
             int size = qMin(rect.width()/2 - 20, pieRect.height());
             pieRect.setWidth(size);
@@ -57,7 +59,7 @@ protected:
         }
 
 
-        QList<QColor> colors = {
+        QList colors = {
             QColor(88,166,255),
             QColor(121,192,255),
             QColor(248,81,73),
@@ -74,11 +76,10 @@ protected:
         int startAngle = 0;
         QList<QPair<QString,double>> items;
         for (auto it = data.constBegin(); it != data.constEnd(); ++it) items.append({it.key(), it.value()});
-        std::sort(items.begin(), items.end(), [](auto& a, auto& b){ return a.second > b.second; });
+        std::sort(items.begin(), items.end(), [](const auto& a, const auto& b){ return a.second > b.second; });
 
-        for (const auto& item : items) {
-            double value = item.second;
-            int span = static_cast<int>((value / total) * 360.0 * 16);
+        for (const auto& [category, value] : items) {
+            auto span = static_cast<int>((value / total) * 360.0 * 16);
             QColor c = colors[colorIdx % colors.size()];
             p.setBrush(c);
             p.setPen(QPen(QColor(33,38,45), 2));
@@ -96,7 +97,7 @@ protected:
         legendFont.setBold(false);
         p.setFont(legendFont);
         
-        for (const auto& item : items) {
+        for (const auto& [category, value] : items) {
             QColor c = colors[colorIdx % colors.size()];
             p.setBrush(c);
             p.setPen(Qt::NoPen);
@@ -104,9 +105,9 @@ protected:
             p.drawRoundedRect(box, 5, 5);
             
             p.setPen(QColor(230,237,243));
-            double percent = (item.second / total) * 100.0;
-            QString text = QString("%1 — %2 руб. (%3%)").arg(item.first)
-                .arg(QString::number(item.second, 'f', 2))
+            auto percent = (value / total) * 100.0;
+            QString text = QString("%1 — %2 руб. (%3%)").arg(category)
+                .arg(QString::number(value, 'f', 2))
                 .arg(QString::number(percent, 'f', 1));
             p.drawText(legendX + 28, legendY + 14, text);
             legendY += 28;

@@ -36,7 +36,7 @@ class IncomeTransaction : public Transaction {
     public:
         IncomeTransaction(std::string name, std::string category, Date date, double amount, std::string incomeSource);
         IncomeTransaction(size_t existingID, std::string name, std::string category, Date date, double amount, std::string incomeSource);
-        ~IncomeTransaction() = default;
+        ~IncomeTransaction() override = default;
 
         void print() override;
         int getType() override;
@@ -61,7 +61,7 @@ private:
 public:
     Expense(std::string name, std::string category, Date date, double amount, std::string where);
     Expense(size_t existingID, std::string name, std::string category, Date date, double amount, std::string where);
-    ~Expense() = default;
+    ~Expense() override = default;
 
     void print() override;
     int getType() override;

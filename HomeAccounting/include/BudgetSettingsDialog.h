@@ -31,7 +31,7 @@ private slots:
 
 public:
     explicit BudgetSettingsDialog(BudgetSettings* settings, QWidget* parent = nullptr);
-    ~BudgetSettingsDialog() = default;
+    ~BudgetSettingsDialog() override = default;
 };
 
 
